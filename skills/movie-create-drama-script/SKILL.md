@@ -1,7 +1,7 @@
 ---
-name: movie-script
+name: movie-create-drama-script
 description: |
-  剧情对话脚本/分镜生成：接收小说原文，产出分镜 JSON（含 purpose/continuity/coverage/assets 结构化字段，供机械校验与审阅闭环消费）+ markdown 渲染版——对话按角色列出、动作肢体级描述、情绪标注（movie-emotional-director 格式）、台词必经口语化（shared/humanizer-zh）、每镜一运镜（shared/cinematography-handbook）。
+  [L1] 剧情对话脚本/分镜生成：接收小说原文，产出分镜 JSON（含 purpose/continuity/coverage/assets 结构化字段，供机械校验与审阅闭环消费）+ markdown 渲染版——对话按角色列出、动作肢体级描述、情绪标注（movie-emotional-director 格式）、台词必经口语化（shared/humanizer-zh）、每镜一运镜（shared/cinematography-handbook）。
   核心方法论：分镜 JSON 为主（机器消费）markdown 并存（人读）、coverage 节拍覆盖防丢戏、continuity 边界锁保证跨镜一致、台词逐字保留供校验、一镜一运镜。
   当用户提到「剧本」「分场剧本」「剧情对话」「小说转剧本」「分镜」「分镜脚本」时使用。
   当用户提供小说章节，要求转成带对话/动作/情绪/运镜的结构化分镜剧本时使用。

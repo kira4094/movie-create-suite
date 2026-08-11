@@ -1,6 +1,6 @@
 # 风格 DNA 库（style-dna）
 
-> 供 movie-character-card / movie-scene-card / movie-script 共用的**风格完整定义**（替代原 genre-keywords 单维度题材标签）。
+> 供 movie-create-design-character / movie-create-design-scene / movie-create-drama-script 共用的**风格完整定义**（替代原 genre-keywords 单维度题材标签）。
 > 每个风格 = 六维 DNA：**题材锚定 / 材质质感 / 运动表演 / 场景构图 / 分镜密度 / 声音** + **负面清单**。
 > 对齐 ComfyUI-H3 的 `rules/styles/*.txt` 设计（每个风格独立文件式规则），但按我们的管线扩展。
 
@@ -101,6 +101,6 @@
 
 1. **题材锚定句**：从「题材锚定」维度取词填入 `国产{题材词}真人高清角色定妆棚拍`。
 2. **风格互斥反向词**：二次元/水墨等非写实风格，按「美术风格与反向词互斥」映射表切换反向词（写实→禁卡通；二次元→禁写实），风格 DNA 的「负面清单」补充专属项。
-3. **分镜密度**：movie-script 按本库密度生成镜头数（15s/30s/60s 参考）。
+3. **分镜密度**：movie-create-drama-script 按本库密度生成镜头数（15s/30s/60s 参考）。
 4. **声音**：分镜 JSON 的 sfx 参考本库声音维度。
 5. **新风格**：按六维模板补充到本库，不散落各 skill。

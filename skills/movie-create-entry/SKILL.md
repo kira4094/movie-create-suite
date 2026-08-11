@@ -1,7 +1,7 @@
 ---
-name: movie-novel-decomposition
+name: movie-create-entry
 description: |
-  小说影视化拆解编排入口：接收完整小说文本，编排调用 6 个独立 skill 完成全流程——novel-scanner（全本扫描）→ movie-character-card（角色卡）/ movie-scene-card（场景卡）/ movie-script（剧情脚本）/ movie-emotion-timeline（情绪时间轴）→ movie-dialogue-table（配音台词表）。
+  [ENTRY] 小说影视化拆解编排入口：接收完整小说文本，编排调用 6 个独立 skill 完成全流程——novel-scanner（全本扫描）→ movie-character-card（角色卡）/ movie-scene-card（场景卡）/ movie-script（剧情脚本）/ movie-emotion-timeline（情绪时间轴）→ movie-dialogue-table（配音台词表）。
   本 skill 是薄壳编排器，不含具体生成规则（各生成规则在对应独立 skill 中）；也可单点调用任意独立 skill。
   当用户提到「小说改编」「AI漫剧」「全流程拆解」「拆整本小说」「小说转漫剧」且需要走完整管线时使用。
   当用户提供小说文本，要求产出全部影视化资产（角色卡+场景卡+剧本+情绪时间轴+配音表）时使用。

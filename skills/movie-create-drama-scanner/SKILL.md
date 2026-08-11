@@ -1,7 +1,7 @@
 ---
-name: novel-scanner
+name: movie-create-drama-scanner
 description: |
-  小说全本扫描器：接收完整小说文本，一次性扫描产出「角色清单、场景清单、情绪拐点索引、服装变化节点、关键道具清单」五类索引，作为其他影视化 skill（movie-character-card / movie-scene-card / movie-script / movie-emotion-timeline / movie-dialogue-table）的统一数据源，保证前后一致性。
+  [L1] 小说全本扫描器：接收完整小说文本，一次性扫描产出「角色清单、场景清单、情绪拐点索引、服装变化节点、关键道具清单」五类索引，作为其他影视化 skill（movie-character-card / movie-scene-card / movie-script / movie-emotion-timeline / movie-dialogue-table）的统一数据源，保证前后一致性。
   核心方法论：一次性全量扫描（禁止边扫边写）、叙事焦点≠场景本体（本体由场景名回推）、角色/场景按物理实体去重。
   当用户提到「小说扫描」「全本拆解」「角色清单」「场景清单」「小说分析索引」或需要为小说影视化做前置扫描时使用。
   当用户提供完整小说文本，要求先盘点角色/场景/情绪/服装节点，再交给其他 skill 生成资产时使用。

@@ -79,7 +79,7 @@
 
 ## 与各 skill 的衔接
 
-- **movie-scene-card**：风格与美学设定段的「渲染特征」从本库选型（如紫极仙宫 → IMAX 65mm 级 + 35mm 颗粒）
-- **movie-character-card**：角色资产图可指定「ARRI Alexa 级色彩 + 35mm 颗粒」统一剧集质感
-- **movie-style**：截图提炼时若需复现胶片感，用本库规格词替代抽象"胶片感"
-- **movie-emotional-director**：视频提示词「风格色调与光景」段引用本库
+- **movie-create-design-scene**：风格与美学设定段的「渲染特征」从本库选型（如紫极仙宫 → IMAX 65mm 级 + 35mm 颗粒）
+- **movie-create-design-character**：角色资产图可指定「ARRI Alexa 级色彩 + 35mm 颗粒」统一剧集质感
+- **movie-create-design-style**：截图提炼时若需复现胶片感，用本库规格词替代抽象"胶片感"
+- **movie-create-out-video-director**：视频提示词「风格色调与光景」段引用本库

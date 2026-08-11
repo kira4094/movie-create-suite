@@ -1,7 +1,7 @@
 ---
-name: movie-emotion-timeline
+name: movie-create-drama-emotion
 description: |
-  情绪时间轴生成：接收小说原文或 novel-scanner 情绪拐点索引，产出全角色情绪时间轴——每节点含章节/事件/情绪（映射 movie-emotional-director 10 情绪）/强度/原文证据/生理表现/脚本互引。
+  [L1] 情绪时间轴生成：接收小说原文或 novel-scanner 情绪拐点索引，产出全角色情绪时间轴——每节点含章节/事件/情绪（映射 movie-emotional-director 10 情绪）/强度/原文证据/生理表现/脚本互引。
   核心方法论：每个情绪节点必须有原文证据、强度三级判定（轻度仅心理/中度1-2处生理/高度失控级）、10类外情绪最近邻映射+备注、不重复造情绪表（引用 movie-emotional-director）。
   当用户提到「情绪时间轴」「情绪曲线」「角色情绪分析」「情绪拐点」「表演情绪标注」时使用。
   当用户提供小说文本，要求分析角色情绪变化并映射到可表演的情绪标注时使用。

@@ -1,6 +1,6 @@
 # 台词口语化规则（humanizer-zh 适配版）
 
-> 本文档是 movie-novel-decomposition 的**台词口语化规则**，供 SKILL.md Phase 4 与 script-spec.md 引用。
+> 本文档是 movie-create-entry 的**台词口语化规则**，供 SKILL.md Phase 4 与 script-spec.md 引用。
 > **执行工具**：全局 humanizer-zh skill（通用去 AI 味规则）。
 > **本文件定位**：只定义漫剧台词/旁白特有的口语化规则，不复制 humanizer-zh 的完整内容——通用模式（AI 词汇、三段式、破折号、否定排比等）对台词同样适用，直接调用 humanizer-zh 执行；本文件补充台词层特化规则。
 

@@ -1,6 +1,6 @@
 # 共享负面块（negative-block）
 
-> 供 movie-character-card / movie-scene-card / movie-script 等所有生图/生视频提示词引用的通用负面词库。
+> 供 movie-create-design-character / movie-create-design-scene / movie-create-drama-script 等所有生图/生视频提示词引用的通用负面词库。
 > 用法：提示词反向段 = 风格互斥反向词 + 本库通用负面块 + 任务特有负面。
 
 ## 通用负面块（任何任务都加）
