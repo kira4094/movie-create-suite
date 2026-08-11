@@ -1,7 +1,7 @@
 {
   "apiVersion": "reasonix.io/plugin/v2",
   "name": "movie-create-suite",
-  "version": "v0.5.0(20260811.1645)",
+  "version": "v0.5.1(20260811.1706)",
   "description": "AI 漫剧生产管线：小说 → 分镜 JSON → 机械校验 → 导演审阅闭环 → 配音台词表。11 个 skill（novel-scanner / movie-scene-layout / movie-scene-card / movie-character-card / movie-script / movie-script-review / movie-emotion-timeline / movie-dialogue-table / movie-emotional-director / movie-style / movie-novel-decomposition）+ shared 共享层（运镜/台词/相机胶片/负面块/风格DNA/机械校验脚本）",
   "homepage": "https://github.com/kira4094/movie-create-suite",
   "repository": "https://github.com/kira4094/movie-create-suite",
