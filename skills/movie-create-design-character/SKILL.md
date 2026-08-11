@@ -40,8 +40,8 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\01-角色卡\{角色名}.md
 > 产出提示词前必须先问清需求，**不得擅自假定美术风格**。用 ask 工具一次问清：
 
 1. **美术风格（三选一）**：
-   - **A. movie-style**：用户提供电影/剧集参考（导演+片名+截图）→ 走 movie-create-design-style 提炼
-   - **B. 风格库预设**：从 `D:\Projects\TolariaData\MovieCreate\美术风格库\` 94 风格选一（真人35/2D 29/3D 30），用其「提示词锚定词」注入
+   - **A. movie-style**：用户提供电影/剧集参考（导演+片名+截图）→ 调用 movie-create-design-style 提炼
+   - **B. 风格库预设**：用户说"选 XX 风格 / 风格库里的 XX" → 调用 **movie-create-design-preset**，从 94 风格库（真人35/2D 29/3D 30）选风格，取回完整风格块（锚定句+锚定词+反向词）注入本卡
    - **C. 跳过/自定义**：不指定，靠 style-dna 自统一（默认），用户也可自行给提示词
    - ⚠️ 三选一互斥：选 A 后不再注入 B 的锚定词；选 B 后不用 movie-style 分析链路；选 C 走 style-dna
    - 若用户说"风格库里的 XX 风格"→ 对应 B；说"要复刻某电影"→ 对应 A
