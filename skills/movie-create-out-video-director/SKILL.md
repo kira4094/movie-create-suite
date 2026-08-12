@@ -136,17 +136,23 @@ description: |
 【基础模式（T2VA/I2VA/FL2VA/L2VA）】
 （有图时第一行写图片对齐指令，后空一行）
 integrated_multimodal_description: [Shot 1] Cinematic, live-action, a medium-wide shot frames ...
-overall_soundscape: 1-4句环境音英文连续段落
+overall_soundscape: 1-4句环境音连续段落（中英文皆可）
 non_diegetic_music: 器乐/速度/节奏描述，无配乐写 N/A
 
 【全能参考模式（Ref2VA）】
 subject_definitions:
 summary: [keyframe completion + reference generation 等任务类型组合]
 retention_analysis: [<Subject N>: fully_preserved / partially_preserved / attribute_transfer / weak_reference]
-detailed_description: 350-500英文词，[Shot 1] 结构
+detailed_description: 350-500词（中英文皆可，中文用户用中文更精准），[Shot 1] 结构
 overall_soundscape:
 non_diegetic_music:
 ```
+
+**语言政策（H3）**：**默认中文输出**（用户可自行修改微调；英文用户看不懂改不了）。
+- 结构字段名（integrated_multimodal_description / overall_soundscape / non_diegetic_music）保持英文（模型识别字段）
+- **画面描述、声音描述、情绪描述默认中文**（用户可读可改，且中文描述更精准、不经过翻译损耗）——用户明确要英文版时才出英文
+- 台词 `<d>[Language] 原文</d>` 逐字保留原语言，不翻译
+- 图片对齐指令用中文表达意图（如「图1 对应视频 0.00 秒」），不强制英文句式
 
 **H3 台词语法**：`<d>[Language] 原文</d>` 逐字保留；说话人统一 `(S1)` `(S2)` 跨镜头不变；画外音后写明嘴不动；跨镜头台词两端 `<scenetrans>` + 写明音频延续；结尾截断 `<cutoff>`。
 
@@ -177,7 +183,7 @@ non_diegetic_music:
 - 短标签格式：`[@语义名]`（如 [@角色1]、[@场景1]、[@道具1]），语义名与素材一一对应
 - 映射声明列出**每个素材**：语义名 → 参考标签 → 一句话内容说明
 - 正文中首次出现短标签处，可补一句该素材的核心特征（≤20字，有参考图时），之后全程用短标签
-- 参考图仍按平台/节点上传顺序对应 `<Picture 1/2/3...>`
+- 参考图仍按平台上传顺序对应 `<Picture 1/2/3...>`（映射声明与上传顺序一致）
 - Seedance 用 `<图片N>`，MiniMax H3 用 `<Picture N>`，映射声明随模型切换标签体系
 
 ### 2. 图片对齐指令（MiniMax H3 强制，Seedance 参考）
@@ -232,8 +238,13 @@ non_diegetic_music:
 按「模型适配层」确认目标模型 → 按「任务类型路由表」判断任务类型。**两步决定后续所有句式选择。**
 
 ### 第一步半：分镜 JSON 模式（输入为 03-分镜.json 时走此分支）
-- 分镜 JSON 已含每镜的 `camera/action/mood/dialogue/ref_anchors`——**跳过素材解析与情绪工程**（mood 已由 movie-create-drama-script 标注）
-- 逐镜生成：每镜读 `camera`（运镜）+ `action`（动作）+ `mood`（情绪→生理表现）+ `dialogue`（台词）+ `ref_anchors`（参考图锚点）
+- 分镜 JSON 已含每镜的 `camera/action/mood/dialogue/ref_anchors`——**跳过素材解析**，但**不跳过情绪工程**（mood 只是情绪标签，必须展开成生理表现链）
+- 逐镜生成：每镜读 `camera`（运镜）+ `action`（动作）+ `mood`（情绪→**按第三步情绪工程展开成生理表现**）+ `dialogue`（台词）+ `ref_anchors`（参考图锚点）
+- **⚠️ 情绪强制展开规则（分镜 JSON 模式必做，2026-08-12 用户确认）**：
+  - 每镜 `mood` 标签必须按「第三步·情绪工程」展开为**可表演的生理表现**（不是只写"她惊讶"而是"眼睛骤然睁大，瞳孔放大，呼吸停滞半拍"）
+  - **情绪链完整**：相邻镜头情绪需有过渡缓冲（峰值前铺垫、峰值后回落）；情绪峰值伴随肢体失控/抑制反应（屏息/轻颤/僵直）；情绪回落通过呼吸放缓、肌肉松弛体现
+  - **动作四层次**：每镜至少体现 1 层（微动作/惯性动作/神经反应/失控反应），峰值镜必含神经或失控反应
+  - 若 mood 连续相同 → 允许省略重复展开，但标记"情绪延续"
 - 输出：每镜一条适配目标模型的提示词
 - `ref_anchors` 中的资产 → 用目标模型的参考标签引用
 - `hook` 字段提示镜头目的，帮助决定运镜强度与节奏
