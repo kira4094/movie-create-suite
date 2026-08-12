@@ -79,7 +79,6 @@ const syncPaths = [
   { path: path.join(ROOT, ".claude-plugin", "plugin.json") },
   { path: path.join(ROOT, "plugin", ".claude-plugin", "plugin.json") },
   { path: path.join(ROOT, "plugin", "version.json") },
-  { path: path.join(ROOT, "reasonix-plugin.json") },
 ];
 for (const { path: p } of syncPaths) {
   try {
