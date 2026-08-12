@@ -1,6 +1,6 @@
 {
   "name": "movie-create-suite",
-  "version": "v0.11.0(20260812.1728)",
+  "version": "v0.12.0(20260812.1754)",
   "description": "AI 漫剧生产管线：小说 → 分镜 JSON → 机械校验 → 导演审阅闭环 → 配音台词表 → 视频提示词。12 个 skill：剧本层 [L1] drama-{scanner,script,review,emotion,dialogue}、美术层 [L2] design-{style,scene-layout,scene,character,preset}、入口 entry、出口 out-video-director；shared 共享层（运镜/台词/相机胶片/负面块/风格DNA/机械校验脚本）。",
   "homepage": "https://github.com/kira4094/movie-create-suite",
   "repository": "https://github.com/kira4094/movie-create-suite",
