@@ -39,7 +39,23 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\03-分镜.json          ← 分�
 
 ### 第三步：分镜 JSON（按 references/script-spec.md 的 Schema）
 每镜必填：shot_id / time_range / duration（2-5s）/ scene / characters / props / shot_size / camera（一镜一运镜，起点-速度-终点）/ action（肢体级）/ dialogue（逐字保留）+ speaker / sfx / mood / **hook**（镜头钩子类型：定调/信息揭示/情绪爆发/悬念/笑点/反转/压迫/转场）/ **ref_anchors**（参考锚点，供视频引用）/ **purpose**（镜头目的）/ **screen_direction**（轴线，多主体时）/ **continuity.start-end**（边界锁）。
-全片：**coverage**（节拍→镜头映射，4 态）+ **assets**（角色/场景/道具 + 出场镜头号，中文原名）。
+全片：**coverage** + **assets**（以下为机械校验消费的确切格式）：
+
+```
+coverage: [
+  {"beat": "{节拍名}", "shot_ids": ["{镜头ID}"], "status": "covered"}
+  // beat=节拍名；shot_ids=落实该节拍的镜头ID数组（字段名必须 shot_ids，不是 shots）
+  // status: covered / omitted_with_reason / nonvisual_context
+]
+assets: {
+  "characters": [{"id": "{角色名}", "desc": "{外观/身份一句话}"}],
+  "scenes":     [{"id": "{场景名}", "desc": "{环境一句话}"}],
+  "props":      [{"id": "{道具名}", "desc": "{特征一句话}"}]
+}
+// assets 必须是对象数组（每项含 id + desc），不是字符串数组——机械校验按 x.id 核对
+// 每镜 props 名必须与 assets 中 props.id 完全一致（简写/换名会导致资产遗漏 high）
+// 出场镜头号：可用 shot_ids 反推，不强制登记
+```
 
 ### 第四步：台词口语化（必经步骤，调用 ../shared/humanizer-zh.md）
 每句台词/旁白产出后必经口语化检查（书面→口语、人设差异化、口语质感、反朗读腔）。
@@ -79,7 +95,8 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\03-分镜.json          ← 分�
 ## 质量检查清单（交付前逐项）
 
 - [ ] 分镜 JSON 符合 Schema（purpose/continuity/coverage/assets/hook/ref_anchors 齐全）
-- [ ] coverage 无丢戏（每个节拍 covered 或注明原因）
+- [ ] coverage 无丢戏（每个节拍 covered 或注明原因），shot_ids 字段名正确
+- [ ] 每镜 props 名与 assets 中 props.id 完全一致（不简写/不换名）
 - [ ] continuity.end = 下一镜 continuity.start
 - [ ] 台词逐字保留（口语化在入镜前完成，入镜后不改）
 - [ ] 动作肢体级描述（无"奔跑/战斗/哭泣"抽象动词）
