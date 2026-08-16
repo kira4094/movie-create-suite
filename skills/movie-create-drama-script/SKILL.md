@@ -69,13 +69,21 @@ assets: {
 ### 第六步：情绪标注
 `movie-emotional-director: 情绪·强度`（10 情绪名+轻度/中度/高度）；情绪通过具体表情/手势/呼吸/视线呈现。
 
-### 第七步：机械校验（调用 validate_storyboard.cjs）
-分镜 JSON 产出后，跑 `validate_storyboard.cjs 03-分镜.json` 机械校验：
+### 第七步：机械校验（调用 ../shared/scripts/validate_storyboard.cjs）
+分镜 JSON 产出后，跑 `node ../shared/scripts/validate_storyboard.cjs 03-分镜.json` 机械校验：
 - 时长归一化（镜头之和=目标时长，重算 time_range）
 - assets 反推（扫描 shots 字段核对 assets 一致性，遗漏/多余）
 - 台词核对（与原文逐字比对）
 - 覆盖率核对（每个节拍都有镜头落实）
 校验报告修正后才算完成。
+
+🔴 CHECKPOINT：校验 FAIL → 不进入下一步，先修正；校验 PASS → 才可进审阅/渲染。
+
+### 第八步：审阅-修正（drama-review 闭环）
+- 校验通过后交 movie-create-drama-review 审阅：coverage/continuity/assets/台词逐字核对
+- 审阅发现问题 → 修正对应字段（禁改台词，只动问题字段）
+- 审阅-修正-复核循环，**PASS 才算完成**
+- 每轮复核必须重新跑第七步机械校验
 
 ### 第九步：humanizer 拟人化（可选，审阅/校验通过后执行）
 > 小说为 AI 生成时，台词自带 AI 味（书面化/堆砌/工整）。审阅通过后的最终版，用 `../shared/humanizer-zh.md` 过一遍台词拟人化。

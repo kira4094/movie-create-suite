@@ -21,3 +21,12 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-08-16T12:18	(uncommitted)	movie-create-entry	-	3-0 better	keep	dim3+dim9	失败降级6行+反例黑名单5行；3judge全票better；表格移出代码块修复格式	dry_run
 2026-08-16T12:20	(uncommitted)	movie-create-entry	-	3-0 better	keep	dim2	两层架构简图与详图对齐（L2先美术→L1后剧本）；暂停点③措辞+out段移回code block修复残留	dry_run
 2026-08-16T12:21	(uncommitted)	movie-create-entry	-	3-0 better	keep	dim5	输入识别定调决策表+CHECKPOINT门禁+交付模板；修复路径B指向+目标平台确认	dry_run
+2026-08-16T12:32	(uncommitted)	movie-create-drama-emotion	-	3-0 better	keep	dim4+dim6	🔴CHECKPOINT+10情绪内联+movie-emotional-director全套件清除（SKILL+spec）	dry_run
+2026-08-16T12:33	(uncommitted)	movie-create-drama-dialogue	-	3-0 better	keep	dim6+dim4	分镜JSON优先+🔴CHECKPOINT+movie-emotional-director清零；补齐10情绪配音参数	dry_run
+2026-08-16T12:34	(uncommitted)	movie-create-drama-script	-	3-0 better	keep	dim2+dim4+dim6	断号修复补第八步审阅闭环；路径补全../shared/scripts/；🔴CHECKPOINT	dry_run
+2026-08-16T12:35	(uncommitted)	movie-create-design-scene-layout	-	3-0 better	keep	dim3+dim8+dim9	45°俯视补上+颜色标注映射机制+失败降级5行三段式；模板/示例机位同步	dry_run
+2026-08-16T12:36	(uncommitted)	movie-create-design-character	-	3-0 better	keep	dim2+dim3+dim4	重号修复（第七=三视图/第八=Part管线）+🔴前置依赖CHECKPOINT+外部skill缺失降级；41行旧编号同步	dry_run
+2026-08-16T12:37	(uncommitted)	movie-create-drama-story	-	3-0 better	keep	dim4	选项确认从可选改🔴必选门禁；处理流程同步	dry_run
+2026-08-16T12:38	(uncommitted)	movie-create-drama-review	-	3-0 better	keep	dim6+dim7	时长对账五处口径统一（机械检出=high阻塞/人工不报）；路径补全../shared/scripts/	dry_run
+2026-08-16T12:40	(uncommitted)	movie-create-design-style	-	3-0 better	keep	dim8	新增风格匹配96库环节（查表→读定义→衔接→落定调）；🔴防硬套CHECKPOINT	dry_run
+2026-08-16T12:41	(uncommitted)	movie-create-design-scene	-	3-0 better	keep	dim2+dim6	步骤编号理顺（〇/〇·一/〇·二/〇·三）+短名movie-scene-layout修正	dry_run
