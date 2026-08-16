@@ -1,0 +1,14 @@
+timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
+2026-08-16T12:00	baseline	movie-create-out-video-director	-	93	baseline	-	553行过长/无强制暂停点	dry_run
+2026-08-16T12:00	baseline	movie-create-design-style	-	89	baseline	-	无匹配96库环节	dry_run
+2026-08-16T12:00	baseline	movie-create-drama-review	-	88.4	baseline	-	时长对账矛盾	dry_run
+2026-08-16T12:00	baseline	movie-create-design-scene	-	88.4	baseline	-	编号重复/无🔴	dry_run
+2026-08-16T12:00	baseline	movie-create-design-character	-	87	baseline	-	第七步重号/外部依赖	dry_run
+2026-08-16T12:00	baseline	movie-create-drama-story	-	86	baseline	-	确认可选未强制	dry_run
+2026-08-16T12:00	baseline	movie-create-drama-script	-	80.7	baseline	-	步骤断号/脚本路径	dry_run
+2026-08-16T12:00	baseline	movie-create-design-scene-layout	-	80.7	baseline	-	失败降级薄/无45°俯视	dry_run
+2026-08-16T12:00	baseline	movie-create-drama-dialogue	-	78	baseline	-	输入契约错位	dry_run
+2026-08-16T12:00	baseline	movie-create-drama-emotion	-	76.3	baseline	-	无检查点/映射链断	dry_run
+2026-08-16T12:00	baseline	movie-create-entry	-	74	baseline	-	架构命名矛盾/无降级表	dry_run
+2026-08-16T12:00	baseline	movie-create-drama-scanner	-	65.4	baseline	-	无失败模式/黑名单	dry_run
+2026-08-16T12:00	baseline	movie-create-design-preset	-	63	baseline	-	大分类无映射/反向词冲突	dry_run
