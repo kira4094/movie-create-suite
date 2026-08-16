@@ -39,6 +39,8 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\03-分镜.json          ← 分�
 
 ### 第三步：分镜 JSON（按 references/script-spec.md 的 Schema）
 每镜必填：shot_id / time_range / duration（2-5s）/ scene / characters / props / shot_size / camera（一镜一运镜，起点-速度-终点）/ action（肢体级）/ dialogue（逐字保留）+ speaker / sfx / mood / **hook**（镜头钩子类型：定调/信息揭示/情绪爆发/悬念/笑点/反转/压迫/转场）/ **ref_anchors**（参考锚点，供视频引用）/ **purpose**（镜头目的）/ **screen_direction**（轴线，多主体时）/ **continuity.start-end**（边界锁）。
+**style 字段（继承风格定调，2026-08-16 打通）**：分镜 JSON 的 meta 层加 `"style": "{风格名}"`（从 00-风格定调.md 继承）——分镜写光影/空间/镜头语言时参考该风格的「空间语言/视觉张力/禁止误区」（shared/风格定义库/{编号}_{风格}.md）；供 out-video-director 读 style 生成风格块。
+
 全片：**coverage** + **assets**（以下为机械校验消费的确切格式）：
 
 ```
