@@ -12,3 +12,4 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-08-16T12:00	baseline	movie-create-entry	-	74	baseline	-	架构命名矛盾/无降级表	dry_run
 2026-08-16T12:00	baseline	movie-create-drama-scanner	-	65.4	baseline	-	无失败模式/黑名单	dry_run
 2026-08-16T12:00	baseline	movie-create-design-preset	-	63	baseline	-	大分类无映射/反向词冲突	dry_run
+2026-08-16T12:05	3a34486	movie-create-design-preset	（63 → 需重评）	3-0 better	keep	dim2	输入契约96库8群组+查表驱动+反向词单一来源；3judge全票better clear	paired
