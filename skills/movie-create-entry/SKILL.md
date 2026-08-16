@@ -27,7 +27,7 @@ description: |
               ↓ 继承风格定调（不重新选）
 ┌─────────────────────────────────────────────────┐
 │ 第一层：文字处理层（剧本解析 + 分镜设计）[L1]       │
-│   novel-scanner → drama-script → drama-review     │
+│   drama-scanner → drama-script → drama-review     │
 │   → drama-emotion → drama-dialogue               │
 │   ★ 产出分镜 JSON（中枢，含 style 字段继承定调）    │
 └─────────────────────────────────────────────────┘
@@ -54,6 +54,11 @@ description: |
    ▼
 movie-create-drama-scanner ── 全本扫描 → 00-扫描索引.md（角色/场景/情绪拐点/服装节点/道具清单）
    │                    🛑 暂停点①：用户确认清单
+   ▼
+★ 风格定调（必选，三选一）── → 00-风格定调.md（全链继承）
+   │   路径A：movie-style 提炼（电影参考图→分析→匹配 96 库最接近风格）
+   │   路径B：96 风格库直接选一（style-index 查表）
+   │   路径C：题材自动匹配推荐
    ▼
 movie-create-design-scene-layout ── 宏观空间蓝图 → 02-场景卡/{场景名}-布局.md（空间骨架先确认）
 movie-create-design-character × N 角色 → 01-角色卡/{角色名}.md
