@@ -15,6 +15,10 @@ description: |
 
 ## 数据源（必读）
 - **本 skill 自用风格库（运行数据源，物理隔离）**：`references/style-index.md`
+- **常见英文别名 → 库内风格名**（查表直接映射，找不到再模糊搜索）：
+  - cyberpunk → Cyberpunk（001）｜steampunk → Steampunk（002）｜gothic → Gothic（003）
+  - noir → Noir（041）｜vaporwave → Vaporwave（035）｜ukiyo-e → Japanese Ukiyo-e（050）
+  - ink wash → Ink Wash（051）｜anime → Anime Cel（072）｜brutalism → Brutalism（085）
   - 含 96 风格全表（8 群组）：风格名 → 核心哲学一句话 + 锚定词 + 反向特例标记
   - 含反向词联动规则表（大分类默认 + 特例修正）
 - 详细 12 段定义在 `shared/风格定义库/`（每个风格一个文件），**本 skill 运行只查 references/style-index.md 拿编号，再读对应定义文件**——不依赖任何项目外路径
