@@ -32,3 +32,4 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-08-16T12:41	(uncommitted)	movie-create-design-scene	-	3-0 better	keep	dim2+dim6	步骤编号理顺（〇/〇·一/〇·二/〇·三）+短名movie-scene-layout修正	dry_run
 2026-08-16T12:49	(uncommitted)	movie-create-entry	-	3-0 better	keep	交互重构	问答式向导（主路径[1]小说/[2]AI创作双分支）+drama-story接入+触发词补全；索引补drama-story	dry_run
 2026-08-16T12:57	(uncommitted)	movie-create-entry	-	3-0 better	keep	层级门控	3暂停点升级为层级门控（继续/先看/停止，未确认默认停）；门控①位置修正到定调后	dry_run
+2026-08-17T13:25	(uncommitted)	movie-create-out-video-director	-	2-0 better	keep	模型选择	自动推断改显式2选1（点选+默认Seedance+中文正文/H3英文结构字段）；2judge better clear够多数决	dry_run
