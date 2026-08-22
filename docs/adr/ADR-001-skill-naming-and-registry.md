@@ -1,42 +1,42 @@
-# ADR-001: Skill Naming and Registry
+# ADR-001：Skill 命名与注册表
 
-> Status: **Accepted by Sol — 2026-08-22.** Implementation authority is granted only by the corresponding Gate record.
+> 状态：**Accepted by Sol — 2026-08-22。** 仅相应 Gate 记录可授予实施权限。
 
-## Context
+## 背景
 
-The plugin has 13 callable Skills but documentation mixes current IDs with historical concept names. The entry’s style route B says preset selection while routing to style extraction. Plugin metadata calls the product a 12-Skill suite, conflating children and public surface.
+插件有 13 个可调用 Skill，但文档混用当前 ID 与旧概念名；入口的风格路径 B 说明为预设选择，却路由到风格提炼；插件元数据将产品称为 12-Skill 套件，混淆了子 Skill 与对外表面。
 
-## Proposed decision
+## 决策
 
-1. A callable Skill ID is valid only when `skills/<id>/`, `SKILL.md` frontmatter `name:`, and a `skills[].id` entry in `skills/shared/skill-registry.json` match exactly.
-2. The 13 IDs in the architecture baseline are the full public registry, preserving explicit 11 / 12 / 13 accounting.
-3. JSON is the machine authority; a Markdown registry is human explanation only and never validator input.
-4. Legacy names may remain only in historical / explanatory prose. The frozen label is `历史概念名（非可调用 Skill）：<old>；当前调用：<movie-create-...>`; when no single replacement exists, list the intent-specific replacements explicitly. Old names must not appear as a call target.
-5. `movie-emotional-director` is resolved by intent: timeline generation → `movie-create-drama-emotion`; video performance → `movie-create-out-video-director`; common vocabulary → shared document, not a Skill.
+1. 可调用 Skill ID 必须同时与 `skills/<id>/`、其 `SKILL.md` frontmatter 的 `name:`、以及 `skills/shared/skill-registry.json` 的 `skills[].id` 完全一致。
+2. 架构基线列出的 13 个 ID 是完整对外注册表，并保留 11 / 12 / 13 的明确口径。
+3. JSON 是机器权威；Markdown 注册表仅供人读，绝不作为校验器输入。
+4. 旧名称仅可出现在历史 / 解释文字中。已冻结标签为 `历史概念名（非可调用 Skill）：<old>；当前调用：<movie-create-...>`；没有单一替换项时，须明确列出按意图区分的替换项。旧名称不得作为调用目标。
+5. `movie-emotional-director` 按意图拆分：情绪时间轴 → `movie-create-drama-emotion`；视频表演 → `movie-create-out-video-director`；共享词汇 → 共享文档而非 Skill。
 
-## Proposed style routing
+## 风格路由
 
-| Route | User intent | Callable Skill | Result |
+| 路径 | 用户意图 | 可调用 Skill | 结果 |
 |---|---|---|---|
-| A | Film / episode references, director and screenshots | `movie-create-design-style` | Evidence-based style extraction |
-| B | Choose from the 96-style library | `movie-create-design-preset` | Preset selection |
-| C | Custom or genre recommendation | No false A/B call | Record the custom direction; route only after user confirmation |
+| A | 影视参考、导演与截图 | `movie-create-design-style` | 证据驱动的风格提炼 |
+| B | 从 96 风格库选择 | `movie-create-design-preset` | 预设选择 |
+| C | 自定义或题材推荐 | 不伪装为 A / B 调用 | 记录自定义方向；仅在用户确认后路由 |
 
-Route C is not a surrogate invocation of A or B. Entry operational text must use full callable IDs.
+路径 C 不是 A 或 B 的替代调用。入口运行说明必须使用完整可调用 ID。
 
-## Consequences
+## 后果
 
-- A later checker can identify missing, extra, and mismatched Skills mechanically.
-- Route B can be corrected without redefining style-Skill behavior.
-- Historical searchability remains, without ambiguous dynamic routing.
-- Plugin descriptions can accurately distinguish 12 child Skills from 13 public Skills.
+- 后续检查器可机械识别遗漏、多余与不匹配的 Skill。
+- 可修正路径 B，而无需重新定义两个风格 Skill 的职责。
+- 保留历史检索能力，同时移除含糊的动态路由。
+- 插件描述可准确区分 12 个子 Skill 与 13 个对外 Skill。
 
-## Rejected alternatives
+## 不采纳方案
 
-- Callable aliases: defeats static validation and clear user routing.
-- Markdown as a second machine registry: creates dual authority and drift.
-- Calling 12 children the plugin total: hides ENTRY and contradicts the layout.
+- 可调用别名：会破坏静态校验与清晰的用户路由。
+- Markdown 作为第二机器注册表：会形成双重权威并漂移。
+- 将 12 个子 Skill 当作插件总数：会隐藏 ENTRY，且与目录结构矛盾。
 
-## Sol decision
+## Sol 决策
 
-**APPROVED.** The naming authority, 13-Skill inventory, JSON registry authority, style routing, and frozen legacy-label format above are accepted. This decision does not authorize changes outside the Stage 1 Gate scope.
+**APPROVED.** 上述命名权威、13-Skill 清单、JSON 注册表权威、风格路由与冻结旧名称标签均已接受。本决策不授权超出阶段 1 Gate 范围的改动。
