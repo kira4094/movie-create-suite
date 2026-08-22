@@ -13,7 +13,9 @@ let registry;
 try { registry = JSON.parse(read(registryPath)); } catch (error) {
   console.error(`无法读取 registry: ${error.message}`); process.exit(1);
 }
+if (registry.schema_version !== 1) errors.push(`registry schema_version 必须为 1，实际为 ${registry.schema_version}`);
 const entries = Array.isArray(registry.skills) ? registry.skills : [];
+if (entries.length !== 13) errors.push(`registry 必须恰好包含 13 个条目，实际为 ${entries.length}`);
 const ids = entries.map(item => item && item.id).filter(Boolean);
 const actual = fs.readdirSync(skillsRoot, { withFileTypes: true })
   .filter(item => item.isDirectory() && item.name !== 'shared' && fs.existsSync(path.join(skillsRoot, item.name, 'SKILL.md')))
@@ -36,8 +38,13 @@ for (const item of entries) {
   for (const dep of item.depends_on || []) if (!fs.existsSync(path.join(root, dep))) errors.push(`依赖不存在: ${item.id} -> ${dep}`);
 }
 const entry = read(entryPath);
-if (!entry.includes('movie-create-design-style')) errors.push('入口缺少路径 A: movie-create-design-style');
-if (!entry.includes('movie-create-design-preset')) errors.push('入口缺少路径 B: movie-create-design-preset');
+const routeLines = route => entry.split(/\r?\n/).filter(line => line.includes(route));
+const routeA = routeLines('路径A');
+const routeB = routeLines('路径B');
+if (!routeA.some(line => line.includes('movie-create-design-style'))) errors.push('入口路径 A 必须调用 movie-create-design-style');
+if (routeA.some(line => line.includes('movie-create-design-preset'))) errors.push('入口路径 A 不得调用 movie-create-design-preset');
+if (!routeB.some(line => line.includes('movie-create-design-preset'))) errors.push('入口路径 B 必须调用 movie-create-design-preset');
+if (routeB.some(line => line.includes('movie-create-design-style'))) errors.push('入口路径 B 不得调用 movie-create-design-style');
 if (/路径C[\s\S]{0,180}调用\s+`?movie-create-(design-style|design-preset)/.test(entry)) errors.push('入口路径 C 不得伪装成 A/B 调用');
 const markdownFiles = [];
 const collectMarkdown = dir => {
