@@ -37,7 +37,7 @@ description: |
               ↓ 继承风格定调 + 美术锚点
 ┌─────────────────────────────────────────────────┐
 │ 文字处理层（剧本解析 + 分镜设计）[L1·后]           │
-│   drama-script（分镜 JSON，含 style 字段）        │
+│   drama-script（分镜 JSON，含 meta.style_source/style_id/style_name） │
 │   → drama-review → drama-emotion → drama-dialogue│
 │   ★ 产出分镜 JSON（中枢）                        │
 └─────────────────────────────────────────────────┘
@@ -72,7 +72,7 @@ movie-create-drama-script          → 03-分镜.json（coverage/continuity/asse
    │  └── validate_storyboard.cjs（机械校验：时长/资产/台词/覆盖率）
    ▼
 movie-create-drama-review          → 审阅-修正-复核闭环直到 PASS
-   │  └── humanizer 拟人化（可选）
+   │  └── dialogue 已冻结；正常审阅只检查忠实度；high 忠实度问题退回 script 入镜前定稿
    ▼
 movie-create-drama-emotion         → 04-情绪时间轴.md（从分镜 JSON 的 mood 汇总）
 movie-create-drama-dialogue        → 05-配音台词表.md（从分镜 JSON 抽台词）
@@ -122,7 +122,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 
 ## 调度规则
 
-1. **顺序强制**：scanner 先行（一致性基础）→ 角色/场景卡并行（互不依赖）→ script（分镜 JSON）→ review（审阅 PASS）→ emotion/dialogue（吃分镜 JSON）→ out-video-director（吃分镜 JSON 出视频提示词）
+1. **顺序强制**：scanner 先行（一致性基础）→ 角色/场景卡并行（互不依赖）→ script（入镜前完成一次 dialogue 定稿并写入分镜 JSON）→ review（正常审阅不改写 dialogue；high 忠实度问题退回 script 定稿并重新机械校验/审阅）→ emotion/dialogue（继承分镜 JSON）→ out-video-director（继承分镜 JSON 出视频提示词）
 2. **层级门控铁律（每层边界必停，防 token 浪费）**——每层完成后统一询问，格式：
    `【层间确认】{本层产出摘要}。继续？`
    - [1] 继续下一层｜[2] 先看本层产出｜[3] 停止/调整
