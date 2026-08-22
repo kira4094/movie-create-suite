@@ -105,3 +105,34 @@ git diff --check
 ## 后续阶段
 
 本 Gate 完成后只允许进入 Q0 黄金样例人工评测，不授权其他工程化阶段。
+
+## Sol 最终验收
+
+> 验收结果：**ACCEPTED（最终通过）**
+>
+> 验收日期：2026-08-22
+>
+> 实现提交：`4974e75 fix: align dialogue and style prompt contracts`
+
+Luna 在隔离暂存区完成 7 个批准文件的修改。Sol 逐文件预检后发现并退回两类问题：正式规范残留“逐字保留原文”的重复台词小节，以及冻结台词在忠实度失败时缺少合法退回路径。Luna 修正后，台词 high 问题会使当前定稿失效并退回入镜前定稿步骤，再重新执行机械校验和审阅。
+
+Terra 首轮实施复审为 `CONDITIONAL`，指出视频导演的通用模板仍固定使用 H3 `<Picture N>`，会污染 Seedance 输出。Luna 将通用模板改为按目标模型解析，并分别保留 H3 与 Seedance 实际标签；Terra 复审最后一个通用反例后返回 `PASS`。
+
+正式仓库验收结果：
+
+```text
+注册表：13 个条目；实际技能：13 个；通过
+分镜回归：测试通过
+git diff --check：通过
+变更范围：仅 7 个批准文件
+```
+
+最终确认：
+
+- `dialogue` 是入镜前单次必要处理后的最终可表演文本；
+- 正常下游只继承，忠实度 high 时退回入镜前重新定稿；
+- `style_source`、`style_id`、`style_name` 已进入正式 JSON、生产与消费说明；
+- H3 正文使用 `<Picture N>`，Seedance 正文使用 `<图片N>`，人读别名不进入模型正文；
+- 未新增三文本、v2、normalizer、稳定资产 ID、`project.json`、代码、fixture 或测试目录。
+
+本 Gate 现已关闭。下一步只允许进入 Q0 黄金样例人工评测。
