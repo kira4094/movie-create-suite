@@ -54,7 +54,7 @@ assets: {
   "scenes":     [{"id": "{场景名}", "desc": "{环境一句话}"}],
   "props":      [{"id": "{道具名}", "desc": "{特征一句话}"}]
 }
-// assets 必须是对象数组（每项含 id + desc），不是字符串数组——机械校验按 x.id 核对
+// assets 必须是对象数组（每项含 id + description），不是字符串数组——机械校验按 x.id 核对
 // 每镜 props 名必须与 assets 中 props.id 完全一致（简写/换名会导致资产遗漏 high）
 // 出场镜头号：可用 shot_ids 反推，不强制登记
 ```
@@ -70,7 +70,7 @@ assets: {
 `movie-create-drama-emotion: 情绪·强度`（10 情绪名+轻度/中度/高度）；情绪通过具体表情/手势/呼吸/视线呈现。
 
 ### 第七步：机械校验（调用 ../shared/scripts/validate_storyboard.cjs）
-分镜 JSON 产出后，跑 `node ../shared/scripts/validate_storyboard.cjs 03-分镜.json` 机械校验：
+分镜 JSON 产出后，跑 `node ../shared/scripts/validate_storyboard.cjs 03-分镜.json` 机械校验（新参数：`--dry-run` 只检查不写回；`--fix` 自动修复 + `--fix --backup` 修复前备份原文件）：
 - 时长归一化（镜头之和=目标时长，重算 time_range）
 - assets 反推（扫描 shots 字段核对 assets 一致性，遗漏/多余）
 - 台词检查（近似文本一致性检查；不声称逐字核对）
