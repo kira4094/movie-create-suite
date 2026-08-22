@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "skills": [
+    { "id": "movie-create-entry", "layer": "ENTRY", "purpose": "小说影视化与 AI 创作流程入口编排", "inputs": ["小说原文", "创作点子"], "outputs": ["全流程资产"], "depends_on": ["skills/shared/scripts/check_skill_registry.cjs"], "planned_dependencies": ["skills/shared/storyboard-contract.md"] },
+    { "id": "movie-create-drama-story", "layer": "L1", "purpose": "从创作点子生成短剧故事", "inputs": ["创作点子", "题材与受众需求"], "outputs": ["剧本-{模式}.md"], "depends_on": [], "planned_dependencies": ["skills/shared/storyboard-contract.md"] },
+    { "id": "movie-create-drama-scanner", "layer": "L1", "purpose": "扫描小说并建立统一索引", "inputs": ["小说原文"], "outputs": ["00-扫描索引.md"], "depends_on": [], "planned_dependencies": ["skills/shared/storyboard-contract.md"] },
+    { "id": "movie-create-drama-script", "layer": "L1", "purpose": "小说原文到结构化分镜", "inputs": ["00-扫描索引.md", "章节原文"], "outputs": ["03-分镜.json", "03-剧情脚本.md"], "depends_on": ["skills/shared/scripts/validate_storyboard.cjs"], "planned_dependencies": ["skills/shared/storyboard-contract.md"] },
+    { "id": "movie-create-drama-review", "layer": "L1", "purpose": "审阅并修正分镜", "inputs": ["03-分镜.json"], "outputs": ["审阅报告"], "depends_on": ["skills/shared/scripts/validate_storyboard.cjs"], "planned_dependencies": ["skills/shared/storyboard-contract.md"] },
+    { "id": "movie-create-drama-emotion", "layer": "L1", "purpose": "从分镜生成情绪时间轴", "inputs": ["03-分镜.json"], "outputs": ["04-情绪时间轴.md"], "depends_on": [], "planned_dependencies": ["skills/shared/storyboard-contract.md"] },
+    { "id": "movie-create-drama-dialogue", "layer": "L1", "purpose": "从分镜生成配音台词表", "inputs": ["03-分镜.json"], "outputs": ["05-配音台词表.md"], "depends_on": [], "planned_dependencies": ["skills/shared/storyboard-contract.md"] },
+    { "id": "movie-create-design-style", "layer": "L2", "purpose": "从电影参考提炼视觉风格", "inputs": ["电影参考图或截图"], "outputs": ["00-风格定调.md"], "depends_on": ["skills/shared/风格定义库-index.md"], "planned_dependencies": [] },
+    { "id": "movie-create-design-preset", "layer": "L2", "purpose": "从 96 风格库选择预设", "inputs": ["风格名或风格偏好"], "outputs": ["00-风格定调.md"], "depends_on": ["skills/shared/风格定义库-index.md"], "planned_dependencies": [] },
+    { "id": "movie-create-design-scene-layout", "layer": "L2", "purpose": "设计场景宏观空间蓝图", "inputs": ["场景清单", "风格定调"], "outputs": ["场景布局文件"], "depends_on": [], "planned_dependencies": ["skills/shared/storyboard-contract.md"] },
+    { "id": "movie-create-design-character", "layer": "L2", "purpose": "生成角色卡与角色视觉提示词", "inputs": ["角色清单", "风格定调"], "outputs": ["角色卡"], "depends_on": [], "planned_dependencies": ["skills/shared/storyboard-contract.md"] },
+    { "id": "movie-create-design-scene", "layer": "L2", "purpose": "生成场景卡与场景视觉提示词", "inputs": ["场景清单", "风格定调", "场景布局"], "outputs": ["场景卡"], "depends_on": [], "planned_dependencies": ["skills/shared/storyboard-contract.md"] },
+    { "id": "movie-create-out-video-director", "layer": "OUT", "purpose": "将分镜转换为视频生成提示词", "inputs": ["03-分镜.json", "角色卡", "场景卡"], "outputs": ["06-视频提示词.txt"], "depends_on": [], "planned_dependencies": ["skills/shared/storyboard-contract.md"] }
+  ]
+}

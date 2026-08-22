@@ -2,7 +2,7 @@
 name: movie-create-design-preset
 description: |
   [L2] 美术风格预设选择器：从 96 风格库（style-index 查表）选一预设风格，输出可直接注入角色卡/场景卡的完整风格块——核心哲学 + 风格锚定词 + 反向词联动 + 生成规格。
-  三选一中的 B 选项（A=movie-style 提炼 / B=本预设 / C=跳过自定义），与 movie-create-design-style 互斥。
+  三选一中的 B 选项（A=movie-create-design-style 提炼 / B=本预设 / C=跳过自定义），与 movie-create-design-style 互斥。
   核心方法论：查表驱动（不臆断风格）、锚定词直接取自本 skill 的 references/style-index.md、反向词按风格大分类联动。
   当用户提到「风格库预设」「选个风格」「风格库里的 XX」「用XX风格」「B选项」或要求快速定风格时使用。
   当 design-character/design-scene 需要美术风格但用户无具体电影参考、只想从预设风格库选时，调用本 skill。
@@ -95,7 +95,7 @@ D:\Projects\TolariaData\MovieCreate\{项目名}\{用途}\{对象}\-风格块-{�
 - [ ] 题材锚定句含{用途}词，可直接替换技能1
 - [ ] 反向词取自 style-index.md「反向词联动规则」表 + 定义文件「禁止误区」（专属优先）
 - [ ] 风格块四段齐全（锚定句/锚定词/反向词/规格）
-- [ ] 与 movie-style 互斥：本 skill 输出不混入任何"电影截图提炼"内容
+- [ ] 与 movie-create-design-style 互斥：本 Skill 输出不混入任何"电影截图提炼"内容
 
 ## 反例黑名单
 | 触发 | 不要做 | 正确做法 |

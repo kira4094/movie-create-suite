@@ -1,7 +1,7 @@
 ---
 name: movie-create-drama-scanner
 description: |
-  [L1] 小说全本扫描器：接收完整小说文本，一次性扫描产出「角色清单、场景清单、情绪拐点索引、服装变化节点、关键道具清单」五类索引，作为其他影视化 skill（movie-character-card / movie-scene-card / movie-script / movie-emotion-timeline / movie-dialogue-table）的统一数据源，保证前后一致性。
+  [L1] 小说全本扫描器：接收完整小说文本，一次性扫描产出「角色清单、场景清单、情绪拐点索引、服装变化节点、关键道具清单」五类索引，作为其他影视化 Skill（movie-create-design-character / movie-create-design-scene / movie-create-drama-script / movie-create-drama-emotion / movie-create-drama-dialogue）的统一数据源，保证前后一致性。
   核心方法论：一次性全量扫描（禁止边扫边写）、叙事焦点≠场景本体（本体由场景名回推）、角色/场景按物理实体去重。
   当用户提到「小说扫描」「全本拆解」「角色清单」「场景清单」「小说分析索引」或需要为小说影视化做前置扫描时使用。
   当用户提供完整小说文本，要求先盘点角色/场景/情绪/服装节点，再交给其他 skill 生成资产时使用。
@@ -56,8 +56,8 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\
 | {角色名} | {第X章} | {事件简述} | {原文情绪词} | {第X章「原文引述」} |
 
 规则：
-- 只记原文明示/强暗示的情绪变化点，供 emotion-timeline 提取
-- 原文情绪词不强制映射（映射是 movie-emotion-timeline 的职责）
+- 只记原文明示/强暗示的情绪变化点，供 movie-create-drama-emotion 提取
+- 原文情绪词不强制映射（映射是 movie-create-drama-emotion 的职责）
 
 ### 4. 服装变化节点
 | 角色 | 章节 | 事件 | 服装/外观变化 | 原文证据 |

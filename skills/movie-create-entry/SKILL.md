@@ -19,9 +19,9 @@ description: |
 ```
 ┌─────────────────────────────────────────────────┐
 │ 入口：风格定调（scanner 扫描后执行，三选一）       │
-│   路径A：movie-style 提炼（电影参考图 → 分析 →     │
+│   路径A：movie-create-design-style 提炼（电影参考图 → 分析 → │
 │          匹配 96 库最接近风格深化）               │
-│   路径B：96 风格库直接选一（style-index 查表）     │
+│   路径B：movie-create-design-preset 直接选一（96 风格库查表） │
 │   路径C：题材自动匹配推荐（用户给题材 → 推荐风格）  │
 │   ★ 产出：00-风格定调.md（全链继承）              │
 └─────────────────────────────────────────────────┘
@@ -57,8 +57,8 @@ description: |
 movie-create-drama-scanner ── 全本扫描 → 00-扫描索引.md（角色/场景/情绪拐点/服装节点/道具清单）
    ▼
 ★ 风格定调（必选，三选一）── → 00-风格定调.md（全链继承）
-   │   路径A：movie-style 提炼（电影参考图→分析→匹配 96 库最接近风格）
-   │   路径B：96 风格库直接选一（style-index 查表）
+   │   路径A：movie-create-design-style 提炼（电影参考图→分析→匹配 96 库最接近风格）
+   │   路径B：movie-create-design-preset 直接选一（96 风格库查表）
    │   路径C：题材自动匹配推荐
    │                    🛑 门控①：定调后确认（继续/先看/停止）
    ▼
@@ -184,8 +184,8 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 识别用户输入，确定风格定调路径：
 | 用户给了什么 | 定调路径 | 下一步 |
 |------------|---------|-------|
-| 电影参考图/截图 | 路径A：movie-style 提炼 → 匹配 96 库 | 调 design-style |
-| 明确风格名（"赛博朋克"） | 路径B：96 库直接选 | 调 design-style（preset 查表功能） |
+| 电影参考图/截图 | 路径A：movie-create-design-style 提炼 → 匹配 96 库 | 调用 `movie-create-design-style` |
+| 明确风格名（"赛博朋克"） | 路径B：96 库直接选 | 调用 `movie-create-design-preset` |
 | 只给题材/什么都没给 | 路径C：题材自动匹配推荐 | 推荐 1-3 个让用户选 |
 | 用户说"跳过风格" | 不落定调文件 | 直接进 scanner，标注「无风格定调」 |
 

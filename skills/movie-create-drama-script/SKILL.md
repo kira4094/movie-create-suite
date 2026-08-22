@@ -1,7 +1,7 @@
 ---
 name: movie-create-drama-script
 description: |
-  [L1] 剧情对话脚本/分镜生成：接收小说原文，产出分镜 JSON（含 purpose/continuity/coverage/assets 结构化字段，供机械校验与审阅闭环消费）+ markdown 渲染版——对话按角色列出、动作肢体级描述、情绪标注（movie-emotional-director 格式）、台词必经口语化（shared/humanizer-zh）、每镜一运镜（shared/cinematography-handbook）。
+  [L1] 剧情对话脚本/分镜生成：接收小说原文，产出分镜 JSON（含 purpose/continuity/coverage/assets 结构化字段，供机械校验与审阅闭环消费）+ markdown 渲染版——对话按角色列出、动作肢体级描述、情绪标注（movie-create-drama-emotion 格式）、台词必经口语化（shared/humanizer-zh）、每镜一运镜（shared/cinematography-handbook）。
   核心方法论：分镜 JSON 为主（机器消费）markdown 并存（人读）、coverage 节拍覆盖防丢戏、continuity 边界锁保证跨镜一致、台词逐字保留供校验、一镜一运镜。
   当用户提到「剧本」「分场剧本」「剧情对话」「小说转剧本」「分镜」「分镜脚本」时使用。
   当用户提供小说章节，要求转成带对话/动作/情绪/运镜的结构化分镜剧本时使用。
@@ -67,7 +67,7 @@ assets: {
 按镜头剧情类型从「小说→运镜推荐映射表」选取；一镜一运镜，写法物理化（起点-速度-终点）。
 
 ### 第六步：情绪标注
-`movie-emotional-director: 情绪·强度`（10 情绪名+轻度/中度/高度）；情绪通过具体表情/手势/呼吸/视线呈现。
+`movie-create-drama-emotion: 情绪·强度`（10 情绪名+轻度/中度/高度）；情绪通过具体表情/手势/呼吸/视线呈现。
 
 ### 第七步：机械校验（调用 ../shared/scripts/validate_storyboard.cjs）
 分镜 JSON 产出后，跑 `node ../shared/scripts/validate_storyboard.cjs 03-分镜.json` 机械校验：
@@ -122,7 +122,7 @@ assets: {
 |------|-------|---------|
 | 内心戏 | 直接呈现内心画面/闪回 | 转旁白（角色名内心）+ 外部行为暗示 |
 | 台词 | 书面化堆砌 | 入镜前必经口语化（humanizer-zh） |
-| 情绪 | 文学修辞（心如刀割） | 用 movie-emotional-director 生理表现表 |
+| 情绪 | 文学修辞（心如刀割） | 用 movie-create-drama-emotion 生理表现表 |
 | 运镜 | 堆叠多个运镜 | 一镜一运镜，物理化描述 |
 | 动作 | "奔跑/战斗/哭泣"抽象词 | 肢体级：起点→过程→终点 |
 | 镜头目的 | "展示场景""推进剧情"空话 | 写清观众注意/信息变化/为什么切镜 |
@@ -133,6 +133,6 @@ assets: {
 | 触发 | 处理 |
 |------|------|
 | 素材信息不足 | 默认值 + 标注可替换 |
-| 无场景卡引用 | 场景名占位，提示用户先跑 movie-scene-card |
+| 无场景卡引用 | 场景名占位，提示用户先运行 movie-create-design-scene |
 | 台词口语化过度 | 保留人设语气，只去 AI 味（回查 humanizer-zh 铁律） |
 | 机械校验工具缺失 | 用质量清单手工核对（可靠性降低，提示用户装脚本） |
