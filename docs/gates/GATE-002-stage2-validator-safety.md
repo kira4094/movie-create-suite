@@ -6,6 +6,44 @@
 >
 > 批准日期：2026-08-22
 
+> 范围修订：**Rev.2 — 2026-08-22，经用户确认。** 本修订将 Stage 2 收窄为“提示词质量防退化”，并覆盖下文中与测试位置、完整 v2 预实现或后续阶段默认推进相冲突的旧表述。
+
+## Rev.2 质量目标
+
+本阶段不以“工程结构更完整”为成功标准，只处理会让短剧提示词链路损坏、丢失信息或产生假通过的真实问题：
+
+- 不可行时长导致死循环或无法结束；
+- `parseInt` 接受畸形时长；
+- `--fix` 写回破坏原文件、包裹对象或未知字段；
+- coverage、`intentional_repeat`、`shot_id`、资产引用或时间轴被误判为通过；
+- 台词检查把近似核对误称为逐字核对，或静默跳过短台词和旁白；
+- 机械修复把 1 秒硬下限误当成 2–5 秒创作质量建议。
+
+本阶段不得建立完整 v2 Schema、normalizer、稳定资产 ID、`assets.registry.json`、`project.json`、全消费者迁移或视频导演模块化。
+
+## Rev.2 测试资产位置
+
+测试文件与生产 Skill 分离。最终允许路径调整为：
+
+- `skills/shared/scripts/validate_storyboard.cjs`
+- `tests/storyboard/test_validate_storyboard.cjs`
+- `tests/storyboard/fixtures/*.json`
+
+旧计划中的 `skills/shared/scripts/test_validate_storyboard.cjs` 与 `skills/shared/scripts/fixtures/` 不再作为最终位置。测试阶段可以使用临时副本或工作区暂存文件；验收前必须清理：
+
+- 与本项目真实缺陷无关的 fixture；
+- 重复覆盖同一行为且没有额外回归价值的 fixture；
+- 调试脚本、`.new`、`.tmp`、备份和中间生成物；
+- 工作区中的未采用实验实现。
+
+最终保留的每个 fixture 必须能对应至少一个明确的历史风险或 Gate 验收条件。fixture 只供测试使用，不得被 Skill 运行时自动加载。
+
+## Rev.2 后续路线
+
+Stage 2 通过后不得自动进入原 V2 Stage 3–6。下一步只能是 Q0：以 2–3 个匿名短剧黄金样例，对角色一致性、场景一致性、剧情覆盖与连续性、台词情绪可表演性、Seedance/H3 格式与实际生成效果进行人工对比。
+
+只有 Q0 证明当前单一 `dialogue` / `mood` 确实造成质量损失时，Sol 才可另行签发最小的“三文本台词 + 逐角色表演”Gate。
+
 ## 已批准输入
 
 - 最终计划：`D:\WindowsOS\Desktop\luna-执行计划-movie-create-suite.md`
