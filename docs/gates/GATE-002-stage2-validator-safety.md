@@ -148,3 +148,53 @@ git diff --check
 ## 后续阶段授权
 
 本 Gate **只授权阶段 2**。即使阶段 2 通过，阶段 3–6 仍须等待 Gate B 独立批准。
+
+## Sol 最终验收
+
+> 验收结果：**ACCEPTED（最终通过）**
+>
+> 验收日期：2026-08-22
+>
+> 实现提交：`7f4a238 fix: harden storyboard quality validation`
+
+### 验收结论
+
+Stage 2 已按 Rev.2 的“提示词质量防退化”范围完成。实现只强化既有 v1 分镜校验、安全修复与回归测试，没有引入完整 v2 Schema、normalizer、稳定素材 ID、`assets.registry.json`、`project.json`、生产端双写、下游消费者迁移或视频导演模块化。
+
+Terra 完成两轮只读复审：首轮为 `CONDITIONAL`，指出混合 1 秒镜头精确收敛、失败不写回、coverage 缺失假通过与旧式顶层 assets 兼容证明不足；修正后第二轮结果为 `PASS`。Sol 随后在正式项目中独立复跑验收。
+
+### 最终冻结口径
+
+- `coverage` 必须是非空数组；每个条目必须显式提供四种已批准状态之一。缺失或未知状态均为 `high`。
+- 包裹 v1 优先读取 `storyboard.assets`；内部缺失时兼容读取旧式顶层 `assets`；两处同时存在且内容冲突时安全失败，不猜测合并。
+- `--fix` 仅可原位修改 `shots[*].duration` 与 `shots[*].time_range`，不得移动资产、改变容器形态或丢失未知字段。
+- 1 秒是机械可行下限；2–5 秒仍是创作质量建议，不能由机械修复强制替代。
+
+### 正式仓库验证证据
+
+以下检查全部通过：
+
+```powershell
+node --check skills/shared/scripts/validate_storyboard.cjs
+node --check tests/storyboard/test_validate_storyboard.cjs
+node tests/storyboard/test_validate_storyboard.cjs
+node skills/shared/scripts/validate_storyboard.cjs tests/storyboard/fixtures/storyboard-impossible-duration-v1.json --dry-run
+node skills/shared/scripts/check_skill_registry.cjs
+git diff --check
+```
+
+验证结果：
+
+- 综合回归测试通过；
+- 不可行时长快速以退出码 `1` 和 `FAIL` 返回，`fix_plan` 为 `null`；
+- 注册表 13 个条目与 13 个实际 Skill 一致；
+- 校验器与测试脚本的正式仓库 SHA-256 分别为 `61D7752688AF5A717C4A2ADEA479EBADAD3ABFBAFC8FE1E7EEF2E4833DECEA6D` 与 `084755455CD19BF4132FBCD82EFD494C6499068BA6E9215BF8B558CE26E99F01`；
+- 最终实现变更严格限制在校验器、测试脚本和 8 个测试 fixture。
+
+### Fixture 与清理结论
+
+8 个 fixture 均直接对应历史风险或 Gate 条件，因此全部保留在 `tests/storyboard/fixtures/`。旧位置 `skills/shared/scripts/fixtures/` 的 8 个未跟踪重复副本已删除；早期未采用的实验暂存目录 `D:\Projects\Codex\work\movie-create-suite-stage2` 已删除。测试 fixture 不会被 Skill 运行时自动加载。
+
+### 后续边界
+
+本验收只完成 Stage 2，不授权自动进入原计划 Stage 3–6。下一步若继续，只能另行签发 Q0 Gate，使用 2–3 个匿名短剧黄金样例进行五维人工质量对比；只有 Q0 证明现有台词或表演字段造成实际质量损失，才可讨论最小字段升级。
