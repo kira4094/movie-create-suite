@@ -50,7 +50,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\02-场景卡\{场景名}.md
 
 ### 第〇·二步：美术风格三选一（与 character 同规则）
 **写画风锚定块之前先定风格来源**（三选一，互斥）：
-- **A. movie-style**：用户提供电影参考 → 调用 movie-create-design-style 提炼，风格块 = 其输出
+- **A. movie-create-design-style**：用户提供电影参考 → 调用该 Skill 提炼，风格块 = 其输出
 - **B. 风格库预设**：用户说"选 XX 风格 / 风格库里的 XX" → 调用 **movie-create-design-preset**，取回风格块（锚定句+锚定词+反向词）注入本卡"风格与美学设定"段
 - **C. 跳过/自定义**：不指定，靠 style-dna 自统一（默认），画风锚定块按模板写
 - ⚠️ 选 A 不注 B 锚定词；选 B 不用 A 分析链路；选 C 走 style-dna

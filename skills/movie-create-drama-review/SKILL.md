@@ -108,6 +108,6 @@ high 只允许 4 类：覆盖率丢戏、台词改写原文、资产遗漏、时
 
 | 触发 | 处理 |
 |------|------|
-| 分镜 JSON 缺 coverage/continuity 字段 | 提示先跑 movie-script v2.0 升级版分镜 |
+| 分镜 JSON 缺 coverage/continuity 字段 | 提示先运行 movie-create-drama-script v2.0 升级版分镜 |
 | 8 轮未 PASS | 交付当前分镜 + 未决问题清单，请用户人工裁定 |
 | 无剧本原文 | 台词核对跳过，其余维度照审，标注"台词未核对" |

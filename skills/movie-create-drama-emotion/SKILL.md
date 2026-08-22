@@ -68,7 +68,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\04-情绪时间轴.md
 ```
 ## 角色 1：{角色名}
 | 节点 | 章节 | 事件 | 情绪 | 强度 | 原文证据 | 生理表现 | 脚本互引 |
-（脚本互引：对应 movie-script 的场次 S01/S02，可后回填）
+（脚本互引：对应 movie-create-drama-script 的场次 S01/S02，可后回填）
 ## 情绪曲线汇总：每角色一条曲线（平静→震惊→愤怒→决绝→释然）
 ```
 
@@ -87,7 +87,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\04-情绪时间轴.md
 - [ ] 强度判定有依据（按证据密度三级）
 - [ ] 全角色覆盖（主角/主要配角/反派；NPC 只记峰值）
 - [ ] 生理表现可表演（无文学修辞）
-- [ ] 与 movie-script 场次互引一致
+- [ ] 与 movie-create-drama-script 场次互引一致
 - [ ] 情绪曲线汇总存在
 
 ## 反例黑名单
@@ -104,4 +104,4 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\04-情绪时间轴.md
 | 触发 | 处理 |
 |------|------|
 | 素材只有单句 | 只提取可确认的情绪点，其余标「未充分描写」 |
-| 与剧本互引未回填 | 交付时场次留空，标注「待 movie-script 回填」 |
+| 与剧本互引未回填 | 交付时场次留空，标注「待 movie-create-drama-script 回填」 |

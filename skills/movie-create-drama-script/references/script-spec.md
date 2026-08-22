@@ -10,7 +10,7 @@
 
 1. **对话按角色列出**：每句台词标注说话角色，供配音（TTS 分轨）与视频生成角色绑定直接使用。
 2. **可演 > 可读**：动作/神态用「可拍摄的物理描述」，不是文学形容。
-3. **情绪标注挂接 movie-emotional-director**：每场标注情绪节点，用 10 情绪名 + 强度。
+3. **情绪标注挂接 movie-create-drama-emotion**：每场标注情绪节点，用 10 情绪名 + 强度。
 4. **保留原文因果**：改编可以删繁就简，但不得改变剧情因果、人物关系、明确台词语义。
 5. **分镜 JSON 化**：分镜输出为结构化 JSON（含 purpose/continuity/coverage/assets），供机械校验与审阅闭环消费；同时渲染 markdown 版给人读。
 6. **台词逐字保留**：台词与原文逐字一致（审阅与机械校验要核对），不翻译不改写。
@@ -111,7 +111,7 @@ JSON 分镜生成后，渲染一份 markdown（从 JSON 转换，不手动维护
 - 禁文学修辞（心如刀割/怒火中烧）。
 
 ### 4. 情绪
-- `movie-emotional-director: 情绪·强度`；用具体表情/手势/呼吸/视线呈现。
+- `movie-create-drama-emotion: 情绪·强度`；用具体表情/手势/呼吸/视线呈现。
 
 ### 5. 运镜
 - 一镜一运镜；写起点-速度-终点；单场 ≤2 个运镜。
@@ -129,7 +129,7 @@ JSON 分镜生成后，渲染一份 markdown（从 JSON 转换，不手动维护
 
 ## 五、与下游的衔接
 
-- **审阅**：movie-script-review 读 JSON 分镜，审阅-修正-复核闭环直到 PASS。
-- **角色/场景卡**：assets 中的角色/场景/道具引用对应的 movie-character-card / movie-scene-card 产物。
-- **配音**：movie-dialogue-table 从分镜 JSON 抽台词（speaker + dialogue + 情绪）。
-- **视频**：分镜 JSON 的 camera/action/mood 是 movie-emotional-director 生成视频提示词的输入。
+- **审阅**：movie-create-drama-review 读 JSON 分镜，审阅-修正-复核闭环直到 PASS。
+- **角色/场景卡**：assets 中的角色/场景/道具引用对应的 movie-create-design-character / movie-create-design-scene 产物。
+- **配音**：movie-create-drama-dialogue 从分镜 JSON 抽台词（speaker + dialogue + 情绪）。
+- **视频**：分镜 JSON 的 camera/action/mood 是 movie-create-out-video-director 生成视频提示词的输入。
