@@ -1,6 +1,6 @@
 {
   "name": "movie-create-suite",
-  "version": "v0.28.7(20260823.0006)",
+  "version": "v0.29.2(20260823.1729)",
   "description": "AI 漫剧生产管线：小说 → 分镜 JSON → 机械校验 → 导演审阅闭环 → 配音台词表 → 视频提示词。插件公开提供 13 个技能：小说改编主路径使用 11 个子技能；AI 创作路径额外使用 movie-create-drama-story，共 12 个子技能；连同入口 movie-create-entry 后合计 13 个。剧本层包括 scanner、script、review、emotion、dialogue；美术层包括 style、preset、scene-layout、scene、character；出口为 out-video-director；shared 为共享层。",
   "homepage": "https://github.com/kira4094/movie-create-suite",
   "repository": "https://github.com/kira4094/movie-create-suite",
