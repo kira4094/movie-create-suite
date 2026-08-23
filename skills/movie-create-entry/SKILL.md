@@ -67,19 +67,27 @@ movie-create-design-character × N 角色 → 01-角色卡/{角色名}.md
 movie-create-design-scene     × N 场景 → 02-场景卡/{场景名}.md（继承布局蓝图 + 五段式）
    │                    🛑 门控②：美术层产出确认（继续/先看出图/调整）
    ▼
-movie-create-drama-script          → 03-分镜.json（coverage/continuity/assets/hook/ref_anchors）
+movie-create-drama-script          → 03-分镜.json（coverage/continuity/assets/hook/ref_anchors，管线中枢·内部态）
    │                                 + 03-剧情脚本.md（markdown 渲染）
+   │                                 + 分镜脚本图提示词.md（第十步逐镜六段式，【分镜块交付物】）
    │  └── validate_storyboard.cjs（机械校验：时长/资产/台词/覆盖率）
    ▼
 movie-create-drama-review          → 审阅-修正-复核闭环直到 PASS
    │  └── dialogue 已冻结；正常审阅只检查忠实度；high 忠实度问题退回 script 入镜前定稿
    ▼
-movie-create-drama-emotion         → 04-情绪时间轴.md（从分镜 JSON 的 mood 汇总）
-movie-create-drama-dialogue        → 05-配音台词表.md（从分镜 JSON 抽台词）
-   │                    🛑 门控③：文字层产出确认（继续/先看分镜/调整）
+movie-create-drama-emotion/dialogue（管线内部态，不独立落盘 04/05）→ 情绪+配音参数内化进 out-video-director
+   │                    🛑 门控③：文字层（分镜脚本图）产出确认（继续/先看/调整）
    ▼
-movie-create-out-video-director    → 轻量任务直接 06-视频提示词.txt；复杂任务 06-视频提示词-规划.md → LOCKED 后 06-视频提示词.txt
+movie-create-out-video-director    → 轻量任务直接 06-视频提示词.txt；复杂任务 06-视频提示词-规划.md → LOCKED 后 06-视频提示词.txt（【视频块交付物】，内化情绪工程+配音参数）
    │  → 跳转 MiniMax Hub / Seedance
+
+🎯 **交付物归位四大块**（用户真正要的）：
+- **① 角色块**：01-角色卡/{角色名}.md × N（定妆+多视图+情绪+穿戴，可粘贴生图）
+- **② 场景块**：02-场景卡/{场景名}.md × N（含 layout 空间蓝图内化，可粘贴生图）
+- **③ 分镜块**：分镜脚本图提示词.md（逐镜六段式，可粘贴分镜图）+ 03-分镜.json（内部态，审阅/视频用）
+- **④ 视频块**：06-视频提示词.txt（每镜可直接粘贴生视频，内化情绪/台词/配音参数）
+- **输入源**：00-原文/（剧本）、00-扫描索引.md（scanner）、00-风格定调.md（风格权威，可选保留）
+- **不产独立交付**：04-情绪时间轴.md、05-配音台词表.md（已内化进视频提示词，不再落盘）
 
 
 ## 失败降级（if-then 三段式，编排器特有）
@@ -109,15 +117,17 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 ├── README.md              ← 拆解概览（本编排器写）
 ├── 00-原文/               ← 小说原文
 ├── 00-扫描索引.md          ← drama-scanner 产出
-├── 01-角色卡/             ← design-character 产出
-├── 02-场景卡/             ← design-scene / scene-layout 产出
-├── 03-分镜.json           ← drama-script 产出（中枢）
+├── 00-风格定调.md          ← 风格定调权威（全链继承，可选保留）
+├── 01-角色卡/             ← design-character 产出（【交付物①角色块】）
+├── 02-场景卡/             ← design-scene / scene-layout 产出（【交付物②场景块】，含空间蓝图内化）
+├── 03-分镜.json           ← drama-script 产出（管线中枢·内部态，审阅/视频用）
 ├── 03-剧情脚本.md          ← drama-script 渲染版
-├── 04-情绪时间轴.md        ← drama-emotion 产出
-├── 05-配音台词表.md        ← drama-dialogue 产出
+├── 分镜脚本图提示词.md       ← drama-script 第十步逐镜六段式（【交付物③分镜块】）
 ├── 06-视频提示词-规划.md     ← 复杂 OUT 任务的编译前规划（必要时等待确认，可选）
-└── 06-视频提示词.txt         ← OUT LOCKED 后产出
+└── 06-视频提示词.txt         ← OUT LOCKED 后产出（【交付物④视频块】，内化情绪工程+台词+配音参数）
 ```
+
+> **不产独立交付**：`04-情绪时间轴.md`、`05-配音台词表.md` 已内化进分镜/视频提示词（drama-emotion/drama-dialogue 转为管线内部态），不再独立落盘。
 
 > 若用户指定子目录（如 Realtest/），项目建在 `{根}/{子目录}/{小说名}/`。
 
@@ -141,10 +151,10 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 |----|-------|------|------|
 | L1 | movie-create-drama-story | 剧本-{模式}.md（AI创作源） | 短剧故事生成/从零创作 |
 | L1 | movie-create-drama-scanner | 00-扫描索引.md | 全本扫描/清单盘点 |
-| L1 | movie-create-drama-script | 03-分镜.json + 03-剧情脚本.md | 分镜/剧本 |
+| L1 | movie-create-drama-script | 03-分镜.json + 03-剧情脚本.md + 分镜脚本图提示词.md | 分镜/剧本 + 分镜块交付物 |
 | L1 | movie-create-drama-review | 审阅报告（PASS/FAIL） | 审阅分镜 |
-| L1 | movie-create-drama-emotion | 04-情绪时间轴.md | 情绪分析 |
-| L1 | movie-create-drama-dialogue | 05-配音台词表.md | 配音/TTS |
+| L1 | movie-create-drama-emotion | 情绪标注（内部态，内化进分镜 mood → 视频） | 情绪分析（不独立落盘） |
+| L1 | movie-create-drama-dialogue | 配音参数（内部态，内化进视频提示词） | 配音/TTS（不独立落盘） |
 | L2 | movie-create-design-style | 风格指南（可选前置） | 电影风格提炼 |
 | L2 | movie-create-design-scene-layout | 02-场景卡/{场景}-布局.md | 场景布局/空间蓝图 |
 | L2 | movie-create-design-scene | 02-场景卡/ | 场景卡/场景提示词 |
@@ -206,15 +216,16 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 ### 产出清单
 | 资产 | 路径 | 状态 |
 |------|------|------|
-| 扫描索引 | 00-扫描索引.md | ✅ |
-| 风格定调 | 00-风格定调.md | ✅ |
-| 角色卡 ×N | 01-角色卡/ | ✅ |
-| 场景卡 ×N | 02-场景卡/ | ✅ |
-| 分镜 JSON | 03-分镜.json | ✅ |
-| 情绪时间轴 | 04-情绪时间轴.md | ✅ |
-| 配音台词表 | 05-配音台词表.md | ✅ |
+| 扫描索引 | 00-扫描索引.md | 内部态 |
+| 风格定调 | 00-风格定调.md | 风格权威（可选保留） |
+| 角色卡 ×N（交付①） | 01-角色卡/ | ✅ |
+| 场景卡 ×N（交付②） | 02-场景卡/ | ✅（含空间蓝图内化） |
+| 分镜 JSON | 03-分镜.json | 管线中枢·内部态 |
+| 分镜脚本图提示词（交付③） | 分镜脚本图提示词.md | ✅（逐镜六段式） |
+| 情绪 | drama-emotion 内部态 | 内化进分镜 mood/视频，不落盘 |
+| 配音 | drama-dialogue 内部态 | 内化进视频提示词，不落盘 |
 | 视频提示词规划 | 06-视频提示词-规划.md | 复杂任务按需产出 |
-| 视频提示词 | 06-视频提示词.txt | ✅（LOCKED 后） |
+| 视频提示词（交付④） | 06-视频提示词.txt | ✅（LOCKED 后，内化情绪/台词/配音参数） |
 
 ### 质量自查
 - 各 skill 质量清单是否全过？
