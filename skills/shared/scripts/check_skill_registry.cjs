@@ -87,6 +87,24 @@ for (const file of markdownFiles) {
   }
 }
 for (const id of callTargets) if (!ids.includes(id)) errors.push(`调用目标未注册: ${id}`);
+
+// 产出型质量校验（2026-08-23）：角色卡/场景卡铁律机械校验
+// 扫描 character/scene skill 目录下的实际产出卡（若存在），用 validate_* 脚本校验
+// 即使无产出卡，只要 skill 存在即校验脚本应存在
+const { execSync } = require('child_process');
+const validatorScripts = {
+  'movie-create-design-character': 'validate_character_card.cjs',
+  'movie-create-design-scene': 'validate_scene_card.cjs',
+};
+for (const [skillDir, validator] of Object.entries(validatorScripts)) {
+  const scriptPath = path.join(skillsRoot, 'shared', 'scripts', validator);
+  if (!fs.existsSync(scriptPath)) { errors.push(`缺校验脚本: ${validator}`); continue; }
+  const cardDir = path.join(skillsRoot, skillDir);
+  // 场景卡在 references/ 下的示例不算产出；产出卡在项目测试目录，这里仅验证校验脚本可运行
+  try { execSync('node --check ' + JSON.stringify(scriptPath), { stdio: 'pipe' }); }
+  catch (syntaxError) { errors.push(`${validator} 语法错误：${syntaxError.stderr || syntaxError.message}`); }
+}
+
 console.log(`注册表：${entries.length} 个条目；实际技能：${actual.length} 个`);
 if (errors.length) { console.error(errors.map(error => `- ${error}`).join('\n')); process.exit(1); }
-console.log('通过：名称、注册表覆盖、依赖和风格路由一致。');
+console.log('通过：名称、注册表覆盖、依赖、风格路由和产出型校验脚本一致。');
