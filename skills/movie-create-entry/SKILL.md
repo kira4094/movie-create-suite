@@ -43,7 +43,7 @@ description: |
 └─────────────────────────────────────────────────┘
               ↓ 全部产出 = 文字提示词
 ┌─────────────────────────────────────────────────┐
-│ 出口：out-video-director（分镜 JSON → 视频提示词）  │
+│ 出口：out-video-director（分镜 JSON → 编译前规划 → LOCKED 后视频提示词）  │
 │ → 跳转 MiniMax Hub / Seedance 生成                 │
 └─────────────────────────────────────────────────┘
 ```
@@ -78,7 +78,7 @@ movie-create-drama-emotion         → 04-情绪时间轴.md（从分镜 JSON �
 movie-create-drama-dialogue        → 05-配音台词表.md（从分镜 JSON 抽台词）
    │                    🛑 门控③：文字层产出确认（继续/先看分镜/调整）
    ▼
-movie-create-out-video-director    → 06-视频提示词.txt（分镜 JSON → 逐镜六段式）
+movie-create-out-video-director    → 06-视频提示词-规划.md → 06-视频提示词.txt（规划锁定后由分镜 JSON 编译）
    │  → 跳转 MiniMax Hub / Seedance
 
 
@@ -115,14 +115,15 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 ├── 03-剧情脚本.md          ← drama-script 渲染版
 ├── 04-情绪时间轴.md        ← drama-emotion 产出
 ├── 05-配音台词表.md        ← drama-dialogue 产出
-└── 06-视频提示词.txt        ← out-video-director 产出
+├── 06-视频提示词-规划.md     ← OUT 编译前规划（必要时等待确认）
+└── 06-视频提示词.txt         ← OUT 规划锁定后产出
 ```
 
 > 若用户指定子目录（如 Realtest/），项目建在 `{根}/{子目录}/{小说名}/`。
 
 ## 调度规则
 
-1. **顺序强制**：scanner 先行（一致性基础）→ 角色/场景卡并行（互不依赖）→ script（入镜前完成一次 dialogue 定稿并写入分镜 JSON）→ review（正常审阅不改写 dialogue；high 忠实度问题退回 script 定稿并重新机械校验/审阅）→ emotion/dialogue（继承分镜 JSON）→ out-video-director（继承分镜 JSON 出视频提示词）
+1. **顺序强制**：scanner 先行（一致性基础）→ 角色/场景卡并行（互不依赖）→ script（入镜前完成一次 dialogue 定稿并写入分镜 JSON）→ review（正常审阅不改写 dialogue；high 忠实度问题退回 script 定稿并重新机械校验/审阅）→ emotion/dialogue（继承分镜 JSON）→ out-video-director（先产出编译前规划，必要时停下确认，锁定后继承分镜 JSON 出视频提示词）
 2. **层级门控铁律（每层边界必停，防 token 浪费）**——每层完成后统一询问，格式：
    `【层间确认】{本层产出摘要}。继续？`
    - [1] 继续下一层｜[2] 先看本层产出｜[3] 停止/调整
@@ -130,6 +131,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
    - 用户回 [3] → 记录修改 → 重跑受影响层（不空烧下游）
    - 用户未明确继续 → **默认停在层边界**，不自动推进
    门控位置：① 入口定调后 → 美术层前；② 美术层产出后 → 文字层前（含 HEX 拍板）；③ 文字层产出后 → 出口前
+   OUT 内部的 `AUTO-LOCK / NEEDS-CONFIRMATION / LOCKED` 属于 out-video-director 的编译流程，不新增入口的第四道全局门控。若 OUT 规划命中 `NEEDS-CONFIRMATION`，只暂停 OUT；用户确认后继续，不重跑无关上游层。
 3. **单点调用**：用户只要某类资产 → 直接引导到对应独立 skill，不强制走全流程
 4. **范围标注**：README 记录输入范围（全本/章节），一致性仅限该范围
 
@@ -147,7 +149,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 | L2 | movie-create-design-scene-layout | 02-场景卡/{场景}-布局.md | 场景布局/空间蓝图 |
 | L2 | movie-create-design-scene | 02-场景卡/ | 场景卡/场景提示词 |
 | L2 | movie-create-design-character | 01-角色卡/ | 角色卡/角色提示词 |
-| OUT | movie-create-out-video-director | 06-视频提示词.txt | 分镜→视频提示词 |
+| OUT | movie-create-out-video-director | 06-视频提示词-规划.md + 06-视频提示词.txt | 分镜→编译前规划→视频提示词 |
 | — | shared/（共享层） | style-dna/负面块/运镜库/机械校验脚本 | 所有 skill 引用 |
 
 ## 用户输入处理指令（激活后执行，问答式向导）
@@ -211,7 +213,8 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 | 分镜 JSON | 03-分镜.json | ✅ |
 | 情绪时间轴 | 04-情绪时间轴.md | ✅ |
 | 配音台词表 | 05-配音台词表.md | ✅ |
-| 视频提示词 | 06-视频提示词.txt | ✅ |
+| 视频提示词规划 | 06-视频提示词-规划.md | ✅ |
+| 视频提示词 | 06-视频提示词.txt | ✅（规划 LOCKED 后） |
 
 ### 质量自查
 - 各 skill 质量清单是否全过？
