@@ -15,7 +15,7 @@ const count = re => (s.match(new RegExp(re, 'g')) || []).length;
 // 铁律一：硬性 4 段
 const hard4 = ['参考图映射','一致性铁律','图片对齐','生成规格'];
 for (const h of hard4) if (!has(h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) issues.push(`FAIL 铁律一: 缺「${h}」硬性段`);
-if (!has('9:16') && !has('16:9')) issues.push('FAIL 铁律一: 生成规格缺比例（9:16 或 16:9）');
+if (!has('4:3') && !has('16:9') && !has('9:16')) issues.push('FAIL 铁律一: 生成规格缺比例（默认 4:3 横版，变体 16:9/9:16）');
 
 // 铁律二：风格内联（不写编号）
 // 风格段不应只写"B 风格库·XXX(编号)"，应内联母提示词（含色彩/材质）
