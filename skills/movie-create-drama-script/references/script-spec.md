@@ -86,6 +86,20 @@
 | `duration` | 单镜 2-5 秒创作建议；镜头数 × 平均时长 ≈ 目标时长；最后一镜结束 = 目标时长；时间连续无空洞无重叠 |
 | **分镜密度** | 15s ≈ 4 镜、30s ≈ 5-6 镜、60s ≈ 7-9 镜；**每镜只讲一个信息/情绪单元**（一个知识点/一个情绪点/一个动作） |
 
+### 机械校验硬约束（validate_storyboard.cjs 强制，生成时一次过）
+
+> 2026-08-23 全流程实测踩坑 5 条——以下字段若不按此写，机械校验会 FAIL，先看这里避免返工：
+
+| # | 约束 | 错误写法 | 正确写法 |
+|---|------|---------|---------|
+| 1 | **`duration_seconds` 是顶层字段**（在 storyboard 内、coverage 旁），不是每镜 | 每镜写 duration_seconds | 顶层 `"duration_seconds": 23`，每镜只写 `duration` |
+| 2 | **`time_range` 格式 `M:SS-M:SS`**，且区间长度必须 = duration | `"0-4s"` | `"0:00-0:04"`（4s）；结束秒必须与 duration 一致 |
+| 3 | **资产引用字段是 `shots[].characters/scene/props` 数组**（validator 从这些字段提取"被使用"），不是只写 ref_anchors | 只在 ref_anchors 写 @角色 | 每镜显式写 `"characters": ["牛魔王"]`、`"scene": "花果山"`、`"props": []` |
+| 4 | **`coverage[].status` 必填**，4 状态之一：covered / intentional_repeat / omitted_with_reason / nonvisual_context | 只写 beat + shot_ids | `{"beat": "...", "status": "covered", "shot_ids": [1,2]}` |
+| 5 | **`ref_anchors` 是必填字段**（required 列表），空数组也算有 | 整字段缺失 | `"ref_anchors": []` 或 `["@{角色名}"]` |
+
+**校验通过标准**：high=0 → PASS；medium（如单镜时长 2-5s 建议外）可接受，由审阅判断是否调整。
+
 ### 关键表演的字段落实
 
 以下是生成时的思考维度，不是 Schema 字段。角色的意图、阻碍、策略和触发信息必须转译为现有 `action`、`mood`、`purpose` 或 `camera` 中至少一项可见结果：
