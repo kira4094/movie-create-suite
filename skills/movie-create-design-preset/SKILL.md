@@ -2,7 +2,7 @@
 name: movie-create-design-preset
 description: |
   [L2] 美术风格预设选择器：从 96 风格库（style-index 查表）选一预设风格，输出可直接注入角色卡/场景卡的完整风格块——核心哲学 + 风格锚定词 + 反向词联动 + 生成规格。
-  三选一中的 B 选项（A=movie-create-design-style 提炼 / B=本预设 / C=跳过自定义），与 movie-create-design-style 互斥。
+  四选一中的 B 选项（A=movie-create-design-style 提炼 / B=本预设 / C=跳过风格 / D=自定义或题材推荐），与 movie-create-design-style 互斥。
   核心方法论：查表驱动（不臆断风格）、锚定词直接取自本 skill 的 references/style-index.md、反向词按风格大分类联动。
   当用户提到「风格库预设」「选个风格」「风格库里的 XX」「用XX风格」「B选项」或要求快速定风格时使用。
   当 design-character/design-scene 需要美术风格但用户无具体电影参考、只想从预设风格库选时，调用本 skill。
@@ -37,7 +37,7 @@ description: |
 ```
 D:\Projects\TolariaData\MovieCreate\{项目名}\{用途}\{对象}\-风格块-{风格名}.md
 ```
-单点验证时输出到 `{项目}/` 下的风格块文件；design-character/design-scene 调用时**返回风格块文本**（注入到其提示词的技能1），不落盘。
+单点验证时将风格块写入 `.movie-create/style-guide.md`；design-character/design-scene 调用时**返回风格块文本**并注入对应角色/场景块。旧项目风格文件只读回退，不自动移动或删除。
 
 ## 处理流程
 
@@ -109,7 +109,7 @@ D:\Projects\TolariaData\MovieCreate\{项目名}\{用途}\{对象}\-风格块-{�
 | 触发条件 | 一线修复 | 仍失败兜底 |
 |---------|---------|-----------|
 | style-index.md 缺失 | 报告缺失路径，不臆造风格 | 停下等用户补文件或换数据源 |
-| 用户给风格名但在 96 库全表找不到 | 全表近似匹配 + 标注「近似匹配，原名：XX」 | 用户确认是否自定义 → 走 C 选项（跳过自定义，style-dna 自统一） |
+| 用户给风格名但在 96 库全表找不到 | 全表近似匹配 + 标注「近似匹配，原名：XX」 | 用户确认是否自定义 → 走 D 选项；若跳过风格则走 C 且不调用 style-dna |
 | 用户要"电影那种风格" | 提示这是 A 选项（movie-create-design-style） | 用户坚持走 B → 用风格库最接近的"电影感"风格（如 076_cinematic_still）并标注 |
 | 定义文件 shared/风格定义库/{编号}_{风格}.md 缺失 | 仅用 style-index.md 的锚定词（退化为目录级） | 标注「定义文件缺失，仅目录级信息」，建议用户补文件 |
 | 用户只给题材没给风格 | 按题材推荐 1-3 个风格让用户选（ask 工具） | 用户说"随便" → 按题材匹配最通用风格并标注「自动推荐」 |

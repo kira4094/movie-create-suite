@@ -1,7 +1,7 @@
 ---
 name: movie-create-drama-review
 description: |
-  [L1] 导演审阅：审阅分镜 JSON，输出结构化 PASS/FAIL + 问题清单，并执行「审阅→修正→复核」闭环直到 PASS（受轮数上限保护）。
+  [L1] 导演审阅：审阅内部 `.movie-create/storyboard.json`，输出结构化 PASS/FAIL + 问题清单到 `.movie-create/review.md`，并执行「审阅→修正→复核」闭环直到 PASS（受轮数上限保护）。
   核心方法论：审阅者与创作者分离（不修改只建议）、严重度分级（high 仅 4 类阻塞：丢戏/破坏台词忠实度/资产遗漏/时长错误）、防噪声（推测性措辞降级/确认一致不报/复读检测/限数）、修正硬约束（冻结 dialogue/只动问题字段/禁改镜头数）、温度分层（审阅 0.1 修正 0.2）、轮数上限安全阀。
   当用户提到「审阅分镜」「导演审阅」「分镜检查」「分镜质量」「storyboard review」「审阅剧本」时使用。
   当用户提供分镜 JSON（含 coverage/continuity/assets 字段），要求质量审阅并修正到合格时使用。
@@ -10,7 +10,7 @@ description: |
 # 导演审阅 SKILL v1.0
 
 ## 角色定位
-你是漫剧分镜的导演审阅。审阅分镜 JSON，找出会直接影响成片质量的问题，输出结构化审阅结果。**不修改分镜，只发现问题并给建议**（修正由独立的修正环节执行）。
+你是漫剧分镜的导演审阅。审阅 `.movie-create/storyboard.json`，找出会直接影响成片质量的问题，并将结构化结果写入 `.movie-create/review.md`。**不修改分镜，只发现问题并给建议**（修正由独立的修正环节执行）。
 
 ## 输入
 - 分镜 JSON（必填）：含 storyboard.shots / coverage / assets

@@ -9,37 +9,38 @@ let s;
 try { s = fs.readFileSync(file, 'utf8'); } catch (e) { console.error('无法读取:', e.message); process.exit(1); }
 
 const issues = [];
-const has = re => new RegExp(re, 'm').test(s);
-const count = re => (s.match(new RegExp(re, 'g')) || []).length;
-
-// 铁律一：四 Part 全量 + 顺序
-const parts = [...s.matchAll(/^## Part (\d)/gm)].map(m => parseInt(m[1]));
-const expectedOrder = [1,2,3,4];
-if (parts.length !== 4) issues.push(`FAIL 铁律一: Part 数=${parts.length}，应为 4（当前 ${parts.join(',')}）`);
-else if (parts.join(',') !== expectedOrder.join(',')) issues.push(`FAIL 铁律一: Part 顺序=${parts.join('→')}，应为 1→2→3→4`);
-
-// 铁律二：技能0 强制首段（每个 Part 应有）
-const skill0 = count('技能0');
-if (skill0 < 4) issues.push(`FAIL 铁律二: 技能0 仅 ${skill0} 处，应每 Part 至少 1 处（共≥4）`);
-// 下区裁切（Part2）
-if (!has('下区裁切')) issues.push('FAIL 铁律二: Part2 缺「下区裁切」铁律（需从颈部横切禁头部）');
-
-// 铁律三：背景纯色黑名单（禁场景/山水）
-const bgBlacklist = ['青绿山水','花果山','森林','山水','背景虚化','场景背景','城市','庭院','宫殿'];
-for (const w of bgBlacklist) {
-  const n = count(w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-  if (n > 0) issues.push(`FAIL 铁律三: 背景含场景词「${w}」×${n}（背景必须纯色哑光灰/白）`);
+const quickRequested = /执行档位：快速(?:（用户已确认）)?/.test(s);
+const quick = /执行档位：快速（用户已确认）/.test(s);
+const hasMode = /执行档位：(?:快速(?:（用户已确认）)?|标准|制作)/.test(s);
+if (quickRequested && !quick) issues.push('FAIL 快速档位：缺少用户明确确认');
+if (quickRequested && !/模式豁免：Part2、Part4/.test(s)) issues.push('FAIL 快速档位：缺少精确模式豁免标记');
+const qualification = s.match(/^快速资格：(.+)$/m);
+if (quickRequested && !qualification) issues.push('FAIL 快速档位：缺少快速资格明细');
+if (quickRequested && qualification) {
+  const q = qualification[1];
+  const num = (label, max) => { const m = q.match(new RegExp(`${label}=(\\d+)秒?`)); if (!m || Number(m[1]) > max) issues.push(`FAIL 快速资格：${label}超限或缺失`); };
+  num('时长', 30); num('主角', 2); num('场景', 2);
+  if (!/(?:模型)=(?:Seedance|MiniMax H3)(?:；|$)/.test(q)) issues.push('FAIL 快速资格：模型未明确');
+  if (!/(?:比例)=(?:4:3|9:16|16:9)(?:；|$)/.test(q)) issues.push('FAIL 快速资格：比例未明确');
+  for (const label of ['素材绑定歧义','镜组歧义','忠实度未决','人性化未决','角色归属未决']) if (!new RegExp(`${label}=无(?:；|$)`).test(q)) issues.push(`FAIL 快速资格：${label}必须为无`);
 }
-if (!has('纯色瞎光|纯色哑光|纯色背景')) {
-  // 宽松：至少有纯色
-  if (!has('纯色')) issues.push('FAIL 铁律三: 未找到「纯色」背景约束');
+if (!hasMode) issues.push('FAIL 执行档位：缺少标准/制作/快速标记');
+const matches = [...s.matchAll(/^##\s+Part\s+(\d)\b[^\n]*\n([\s\S]*?)(?=^##\s+Part\s+\d\b|(?![\s\S]))/gmi)];
+const parts = new Map(matches.map(m => [Number(m[1]), m[2]]));
+const exempt = /已省略：Part\s*4（用户明确豁免）/.test(s);
+const expected = quickRequested ? [1,3] : (exempt ? [1,2,3] : [1,2,3,4]);
+if (matches.map(m => Number(m[1])).join(',') !== expected.join(',')) issues.push(`FAIL Part 顺序或数量：应为 ${expected.join('→')}`);
+for (const n of expected) {
+  const body = parts.get(n) || '';
+  if (!body) { issues.push(`FAIL Part${n}：缺失`); continue; }
+  if (!/技能0/.test(body)) issues.push(`FAIL Part${n}：缺少本 Part 的技能0`);
+  if (!/一致性铁律/.test(body)) issues.push(`FAIL Part${n}：缺少本 Part 的一致性铁律`);
 }
-
-// Part3 六格
-if (!has('6 格') && !has('六格') && !has('2行×3列')) issues.push('FAIL Part3: 缺「6 格/2行×3列」布局');
-
-// 一致性铁律
-if (!has('一致性铁律')) issues.push('FAIL 铁律四: 缺「一致性铁律（强制）」');
+if (parts.has(2) && !/下区裁切/.test(parts.get(2))) issues.push('FAIL Part2：缺少下区裁切铁律');
+if (parts.has(3) && !/(6\s*格|六格|2行\s*[×x*]\s*3列)/i.test(parts.get(3))) issues.push('FAIL Part3：缺少六格峰值表情布局');
+const positive = s.split(/\r?\n/).filter(line => /背景/.test(line) && !/负面|禁止|反向|不要|不得/.test(line)).join('\n');
+for (const word of ['森林','山水','城市','庭院','宫殿','场景背景']) if (positive.includes(word)) issues.push(`FAIL 背景正向段含场景词「${word}」`);
+if (!/纯色/.test(positive)) issues.push('FAIL 背景正向段缺少纯色约束');
 
 if (issues.length === 0) console.log(`PASS: ${file}（四Part/背景纯色/Part3六格/技能0 全合格）`);
 else { console.log(`FAIL: ${file}\n` + issues.join('\n')); process.exit(1); }

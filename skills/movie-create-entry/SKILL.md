@@ -1,7 +1,7 @@
 ---
 name: movie-create-entry
 description: |
-  [ENTRY] 小说影视化拆解编排入口：接收完整小说文本，按两层架构编排 11 个独立 skill 完成全流程——美术层先行（design-scene-layout/character/scene 定视觉）→ 剧本层（scanner→script→review→emotion→dialogue 出分镜 JSON）→ 出口 OUT（out-video-director 视频提示词）。
+  [ENTRY] 小说影视化拆解编排入口：接收完整小说文本，按两层架构编排 13 个 Skill 完成四块交付——美术层先行 → 剧本层 → 出口 OUT；情绪和对白通过内存接口直接注入角色、分镜与视频，不生成独立用户文件。
   分镜 JSON 是全管线中枢：剧本层产出 → 审阅/情绪/配音/视频提示词全部消费它。
   本 skill 是薄壳编排器，不含具体生成规则（各生成规则在对应独立 skill 中）；也可单点调用任意独立 skill。
   当用户提到「小说改编」「AI漫剧」「全流程拆解」「拆整本小说」「小说转漫剧」且需要走完整管线时使用。
@@ -12,33 +12,32 @@ description: |
 # 小说影视化拆解编排入口 v2.0
 
 ## 角色定位
-你是小说影视化管线编排器：接收小说文本，按两层架构编排 11 个独立 skill 完成全流程产出。你**不直接生成任何卡片/剧本**——具体生成规则与质量清单在各自 skill 中，你只负责任务调度、顺序保证、暂停点控制。
+你是小说影视化管线编排器：接收小说文本，按两层架构编排 13 个独立 Skill 完成全流程产出。你**不直接生成任何卡片/剧本**——具体生成规则与质量清单在各自 Skill 中，你只负责任务调度、顺序保证、暂停点控制。
 
 ## 两层架构
 
 ```
 ┌─────────────────────────────────────────────────┐
-│ 入口：风格定调（scanner 扫描后执行，三选一）       │
+│ 入口：风格定调（scanner 扫描后执行，四选一）       │
 │   路径A：movie-create-design-style 提炼（电影参考图 → 分析 → │
 │          匹配 96 库最接近风格深化）               │
 │   路径B：movie-create-design-preset 直接选一（96 风格库查表） │
 │   路径C：题材自动匹配推荐（用户给题材 → 推荐风格）  │
-│   ★ 产出：00-风格定调.md（全链继承）              │
+│   ★ 产出：.movie-create/style-guide.md（全链继承） │
 └─────────────────────────────────────────────────┘
               ↓ 继承风格定调（不重新选）
 ┌─────────────────────────────────────────────────┐
 │ 美术风格层（视觉设计先行）[L2·先]                  │
 │   design-scene-layout（空间蓝图先确认）            │
-│   design-character × N 角色 → 01-角色卡/          │
-│   design-scene × N 场景 → 02-场景卡/              │
-│   （读 00-风格定调.md + shared/风格定义库/12段）   │
+│   design-character × N 角色 → 01-角色提示词/      │
+│   design-scene × N 场景 → 02-场景提示词/          │
+│   （读 .movie-create/style-guide.md + 风格定义库）  │
 │   ★ 产出：图像提示词（角色卡/场景卡）              │
 └─────────────────────────────────────────────────┘
               ↓ 继承风格定调 + 美术锚点
 ┌─────────────────────────────────────────────────┐
 │ 文字处理层（剧本解析 + 分镜设计）[L1·后]           │
-│   drama-script（分镜 JSON，含 meta.style_source/style_id/style_name） │
-│   → drama-review → drama-emotion → drama-dialogue│
+│   scanner → 风格（可跳过）→ emotion角色证据 → 角色/场景 → script 3A draft 建立 shot_id → dialogue冻结前建议 + emotion镜头证据 → script 3B合并/冻结/渲染 → 校验 → review → PASS后 voice directives → OUT │
 │   ★ 产出分镜 JSON（中枢）                        │
 └─────────────────────────────────────────────────┘
               ↓ 全部产出 = 文字提示词
@@ -54,40 +53,39 @@ description: |
 小说文本
    │
    ▼
-movie-create-drama-scanner ── 全本扫描 → 00-扫描索引.md（角色/场景/情绪拐点/服装节点/道具清单）
+movie-create-drama-scanner ── 全本扫描 → .movie-create/scan-index.md（角色/场景/情绪拐点/服装节点/道具清单）
    ▼
-★ 风格定调（必选，三选一）── → 00-风格定调.md（全链继承）
+★ 风格定调（必选，四选一）── → .movie-create/style-guide.md（全链继承）
    │   路径A：movie-create-design-style 提炼（电影参考图→分析→匹配 96 库最接近风格）
    │   路径B：movie-create-design-preset 直接选一（96 风格库查表）
    │   路径C：题材自动匹配推荐
    │                    🛑 门控①：定调后确认（继续/先看/停止）
    ▼
-movie-create-design-scene-layout ── 宏观空间蓝图 → 02-场景卡/{场景名}-布局.md（空间骨架先确认）
-movie-create-design-character × N 角色 → 01-角色卡/{角色名}.md
-movie-create-design-scene     × N 场景 → 02-场景卡/{场景名}.md（继承布局蓝图 + 五段式）
+movie-create-design-scene-layout ── 宏观空间蓝图 → .movie-create/scene-layout/{场景名}.md（空间骨架先确认）
+movie-create-design-character × N 角色 → 01-角色提示词/{角色名}.md
+movie-create-design-scene     × N 场景 → 02-场景提示词/{场景名}.md（继承布局蓝图 + 五段式）
    │                    🛑 门控②：美术层产出确认（继续/先看出图/调整）
    ▼
-movie-create-drama-script          → 03-分镜.json（coverage/continuity/assets/hook/ref_anchors，管线中枢·内部态）
-   │                                 + 03-剧情脚本.md（markdown 渲染）
-   │                                 + 分镜脚本图提示词.md（第十步逐镜六段式，【分镜块交付物】）
-   │  └── validate_storyboard.cjs（机械校验：时长/资产/台词/覆盖率）
+movie-create-drama-script          → 3A 建立 draft shots 与 shot_id
+   │
+   ├── movie-create-drama-dialogue → 冻结前忠实度/可表演性建议（至多一次 humanize）
+   ├── movie-create-drama-emotion → 镜头 pass 按 draft shot_id 回传
+   └── script 3B 合并/冻结/渲染 → .movie-create/storyboard.json + 03-分镜提示词.md
+       └── validate_storyboard.cjs → movie-create-drama-review → PASS
+           └── PASS 后 dialogue 按最终 shots 返回 voice directives
+               └── 情绪与对白内化进角色、分镜与视频
+   │                    🛑 门控③：文字层（03-分镜提示词.md）产出确认（继续/先看/调整）
    ▼
-movie-create-drama-review          → 审阅-修正-复核闭环直到 PASS
-   │  └── dialogue 已冻结；正常审阅只检查忠实度；high 忠实度问题退回 script 入镜前定稿
-   ▼
-movie-create-drama-emotion/dialogue（管线内部态，不独立落盘 04/05）→ 情绪+配音参数内化进 out-video-director
-   │                    🛑 门控③：文字层（分镜脚本图）产出确认（继续/先看/调整）
-   ▼
-movie-create-out-video-director    → 轻量任务直接 06-视频提示词.txt；复杂任务 06-视频提示词-规划.md → LOCKED 后 06-视频提示词.txt（【视频块交付物】，内化情绪工程+配音参数）
+movie-create-out-video-director    → 轻量任务直接 04-视频提示词.txt；复杂任务按需 .movie-create/video-plan.md → LOCKED 后 04-视频提示词.txt（【视频块交付物】，内化情绪工程+配音参数）
    │  → 跳转 MiniMax Hub / Seedance
 
 🎯 **交付物归位四大块**（用户真正要的）：
-- **① 角色块**：01-角色卡/{角色名}.md × N（定妆+多视图+情绪+穿戴，可粘贴生图）
-- **② 场景块**：02-场景卡/{场景名}.md × N（含 layout 空间蓝图内化，可粘贴生图）
-- **③ 分镜块**：分镜脚本图提示词.md（逐镜六段式，可粘贴分镜图）+ 03-分镜.json（内部态，审阅/视频用）
-- **④ 视频块**：06-视频提示词.txt（每镜可直接粘贴生视频，内化情绪/台词/配音参数）
-- **输入源**：00-原文/（剧本）、00-扫描索引.md（scanner）、00-风格定调.md（风格权威，可选保留）
-- **不产独立交付**：04-情绪时间轴.md、05-配音台词表.md（已内化进视频提示词，不再落盘）
+- **① 角色块**：01-角色提示词/{角色名}.md × N（定妆+多视图+情绪+穿戴，可粘贴生图）
+- **② 场景块**：02-场景提示词/{场景名}.md × N（含 layout 空间蓝图内化，可粘贴生图）
+- **③ 分镜块**：03-分镜提示词.md（逐镜六段式；JSON 为内部态）
+- **④ 视频块**：04-视频提示词.txt（每镜可直接粘贴生视频，内化情绪/台词/配音参数）
+- **输入源**：`.movie-create/source/`、`.movie-create/scan-index.md`、`.movie-create/style-guide.md`
+- **不产独立情绪或配音文件**：两者均已内化进角色、分镜与视频块
 
 
 ## 失败降级（if-then 三段式，编排器特有）
@@ -114,26 +112,22 @@ movie-create-out-video-director    → 轻量任务直接 06-视频提示词.txt
 
 ```
 D:\Projects\TolariaData\MovieCreate\{小说名}/
-├── README.md              ← 拆解概览（本编排器写）
-├── 00-原文/               ← 小说原文
-├── 00-扫描索引.md          ← drama-scanner 产出
-├── 00-风格定调.md          ← 风格定调权威（全链继承，可选保留）
-├── 01-角色卡/             ← design-character 产出（【交付物①角色块】）
-├── 02-场景卡/             ← design-scene / scene-layout 产出（【交付物②场景块】，含空间蓝图内化）
-├── 03-分镜.json           ← drama-script 产出（管线中枢·内部态，审阅/视频用）
-├── 03-剧情脚本.md          ← drama-script 渲染版
-├── 分镜脚本图提示词.md       ← drama-script 第十步逐镜六段式（【交付物③分镜块】）
-├── 06-视频提示词-规划.md     ← 复杂 OUT 任务的编译前规划（必要时等待确认，可选）
-└── 06-视频提示词.txt         ← OUT LOCKED 后产出（【交付物④视频块】，内化情绪工程+台词+配音参数）
+├── 01-角色提示词/           ← 交付物①
+├── 02-场景提示词/           ← 交付物②
+├── 03-分镜提示词.md         ← 交付物③，drama-script 唯一写入
+├── 04-视频提示词.txt        ← 交付物④，OUT 唯一写入
+└── .movie-create/            ← 原文、扫描、风格、JSON、审阅与复杂规划等内部态
 ```
 
-> **不产独立交付**：`04-情绪时间轴.md`、`05-配音台词表.md` 已内化进分镜/视频提示词（drama-emotion/drama-dialogue 转为管线内部态），不再独立落盘。
+> 新项目只交付上述四块；`.movie-create/` 不增加用户交付物。内部包括 `source/`、`scan-index.md`、`style-guide.md`、`storyboard.json`、`screenplay.md`、`review.md`，复杂 OUT 按需增加 `video-plan.md`。审阅结果写入 `.movie-create/review.md`。情绪和对白直接嵌入角色、分镜与视频。旧项目路径仅只读回退，禁止自动移动或删除。
 
 > 若用户指定子目录（如 Realtest/），项目建在 `{根}/{子目录}/{小说名}/`。
 
 ## 调度规则
 
-1. **顺序强制**：scanner 先行（一致性基础）→ 角色/场景卡并行（互不依赖）→ script（入镜前完成一次 dialogue 定稿并写入分镜 JSON）→ review（正常审阅不改写 dialogue；high 忠实度问题退回 script 定稿并重新机械校验/审阅）→ emotion/dialogue（继承分镜 JSON）→ out-video-director（轻量任务内部检查后直接 LOCKED，复杂任务先规划、必要时确认，锁定后继承分镜 JSON 出视频提示词）
+执行档位默认是标准。快速档位只有在时长、角色、场景、模型、比例与无未决绑定条件全部满足，且用户明确选择后才生效；快速仍保持四块交付，角色仅 Part1+Part3，复杂规划、审阅与 Gate 不因快速而隐式绕过。进入快速前必须一次性合并确认执行档位、模型、比例与所有模式豁免。
+
+1. **唯一权威顺序**：scanner → 风格（可跳过）→ emotion 角色证据 pass → 角色/场景 → script 3A draft 建立 shot_id → dialogue 冻结前建议（至多一次 humanize）+ emotion 镜头 pass → script 3B 合并/冻结/渲染 → 机械校验 → review；若 high 忠实度退回 script，旧冻结失效并重跑相关 pass；PASS 后 dialogue 按最终 shots 生成 voice directives → OUT 核验并消费。
 2. **层级门控铁律（每层边界必停，防 token 浪费）**——每层完成后统一询问，格式：
    `【层间确认】{本层产出摘要}。继续？`
    - [1] 继续下一层｜[2] 先看本层产出｜[3] 停止/调整
@@ -149,17 +143,17 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 
 | 层 | Skill | 产出 | 触发 |
 |----|-------|------|------|
-| L1 | movie-create-drama-story | 剧本-{模式}.md（AI创作源） | 短剧故事生成/从零创作 |
-| L1 | movie-create-drama-scanner | 00-扫描索引.md | 全本扫描/清单盘点 |
-| L1 | movie-create-drama-script | 03-分镜.json + 03-剧情脚本.md + 分镜脚本图提示词.md | 分镜/剧本 + 分镜块交付物 |
-| L1 | movie-create-drama-review | 审阅报告（PASS/FAIL） | 审阅分镜 |
-| L1 | movie-create-drama-emotion | 情绪标注（内部态，内化进分镜 mood → 视频） | 情绪分析（不独立落盘） |
-| L1 | movie-create-drama-dialogue | 配音参数（内部态，内化进视频提示词） | 配音/TTS（不独立落盘） |
+| L1 | movie-create-drama-story | .movie-create/source/story.md（内部故事源） | 短剧故事生成/从零创作 |
+| L1 | movie-create-drama-scanner | .movie-create/scan-index.md | 全本扫描/清单盘点 |
+| L1 | movie-create-drama-script | .movie-create/storyboard.json + .movie-create/screenplay.md + 03-分镜提示词.md | 分镜/剧本 + 分镜块交付物 |
+| L1 | movie-create-drama-review | .movie-create/review.md（内部 PASS/FAIL） | 审阅分镜 |
+| L1 | movie-create-drama-emotion | 内存 `character_peak_expressions[]` + `shot_emotion_directives[]` | 角色/分镜/视频情绪注入 |
+| L1 | movie-create-drama-dialogue | 内存 voice directives（按 shot_id） | 冻结前建议、冻结后逐镜配音参数 |
 | L2 | movie-create-design-style | 风格指南（可选前置） | 电影风格提炼 |
-| L2 | movie-create-design-scene-layout | 02-场景卡/{场景}-布局.md | 场景布局/空间蓝图 |
-| L2 | movie-create-design-scene | 02-场景卡/ | 场景卡/场景提示词 |
-| L2 | movie-create-design-character | 01-角色卡/ | 角色卡/角色提示词 |
-| OUT | movie-create-out-video-director | 轻量任务：06-视频提示词.txt；复杂任务：06-视频提示词-规划.md + 06-视频提示词.txt | 分镜→编译前判断→（必要时规划）→视频提示词 |
+| L2 | movie-create-design-scene-layout | .movie-create/scene-layout/ | 内部场景布局/空间蓝图 |
+| L2 | movie-create-design-scene | 02-场景提示词/ | 场景块/场景提示词 |
+| L2 | movie-create-design-character | 01-角色提示词/ | 角色块/角色提示词 |
+| OUT | movie-create-out-video-director | 轻量任务：04-视频提示词.txt；复杂任务：.movie-create/video-plan.md + 04-视频提示词.txt | 分镜→编译前判断→（必要时规划）→视频提示词 |
 | — | shared/（共享层） | style-dna/负面块/运镜库/机械校验脚本 | 所有 skill 引用 |
 
 ## 用户输入处理指令（激活后执行，问答式向导）
@@ -180,19 +174,19 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 ### 第二步：主路径分支
 **分支 A：小说改编**（[1]）
 1. 确认输入：①小说文本范围（全本/章节）②目标平台（竖屏 9:16 / 横屏 16:9）
-2. 调 movie-create-drama-scanner 扫描 → 00-扫描索引.md
+2. 调 movie-create-drama-scanner 扫描 → `.movie-create/scan-index.md`
 3. 进入风格定调（第三步）
 
 **分支 B：AI 创建脚本**（[2]）
 1. 确认目标平台（竖屏 9:16 / 横屏 16:9）
 2. 调 movie-create-drama-story：问答式（类型/受众/题材/节奏等 10 组选项，数字点选）→ 生成剧本
 3. 生成后 🔴 CHECKPOINT：用户确认剧本 → 才进入 scanner
-4. 调 movie-create-drama-scanner 扫描剧本 → 00-扫描索引.md
+4. 调 movie-create-drama-scanner 扫描剧本 → `.movie-create/scan-index.md`
 5. 进入风格定调（第三步）
 
 > 🔴 CHECKPOINT：分支 B 剧本未生成/未确认 → 不得进入 scanner。
 
-### 第三步：风格定调决策（🔴 必做，三选一）
+### 第三步：风格定调决策（🔴 必做，四选一）
 识别用户输入，确定风格定调路径：
 | 用户给了什么 | 定调路径 | 下一步 |
 |------------|---------|-------|
@@ -207,7 +201,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 告知用户将走**两层架构（美术层先行 → 剧本层）** + 每层边界门控（分支 B 额外有剧本确认点），或按用户需求单点调用。
 
 ### 第五步：执行调度（含层级门控）
-按「调度规则」顺序执行，**每个层级边界执行门控询问**（继续/先看/停止），未确认不自动推进。每步调用对应独立 skill，**不自行生成**。
+严格按唯一权威顺序执行，**每个层级边界执行门控询问**（继续/先看/停止），未确认不自动推进。每步调用对应独立 Skill，**不自行生成**：scanner → 风格（可跳过）→ emotion 角色证据 pass → 角色/场景 → script 3A draft 建立 shot_id → dialogue 冻结前建议 + emotion 镜头 pass → script 3B 合并/冻结/渲染 → 机械校验 → review → PASS 后 dialogue voice directives → OUT。
 
 ### 第六步：交付（输出模板）
 ```
@@ -216,16 +210,12 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 ### 产出清单
 | 资产 | 路径 | 状态 |
 |------|------|------|
-| 扫描索引 | 00-扫描索引.md | 内部态 |
-| 风格定调 | 00-风格定调.md | 风格权威（可选保留） |
-| 角色卡 ×N（交付①） | 01-角色卡/ | ✅ |
-| 场景卡 ×N（交付②） | 02-场景卡/ | ✅（含空间蓝图内化） |
-| 分镜 JSON | 03-分镜.json | 管线中枢·内部态 |
-| 分镜脚本图提示词（交付③） | 分镜脚本图提示词.md | ✅（逐镜六段式） |
-| 情绪 | drama-emotion 内部态 | 内化进分镜 mood/视频，不落盘 |
-| 配音 | drama-dialogue 内部态 | 内化进视频提示词，不落盘 |
-| 视频提示词规划 | 06-视频提示词-规划.md | 复杂任务按需产出 |
-| 视频提示词（交付④） | 06-视频提示词.txt | ✅（LOCKED 后，内化情绪/台词/配音参数） |
+| 角色提示词 ×N（交付①） | 01-角色提示词/ | ✅ |
+| 场景提示词 ×N（交付②） | 02-场景提示词/ | ✅（含内部空间蓝图） |
+| 分镜提示词（交付③） | 03-分镜提示词.md | ✅（逐镜六段式） |
+| 视频提示词（交付④） | 04-视频提示词.txt | ✅（LOCKED 后，内化情绪/台词/配音参数） |
+
+> `.movie-create/scan-index.md`、`.movie-create/style-guide.md`、`.movie-create/storyboard.json`、`.movie-create/review.md` 与复杂任务的 `.movie-create/video-plan.md` 仅作为内部诊断态；用户主动询问时再披露，不列为常规成果。
 
 ### 质量自查
 - 各 skill 质量清单是否全过？

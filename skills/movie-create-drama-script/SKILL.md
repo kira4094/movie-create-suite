@@ -13,7 +13,7 @@ description: |
 你是分镜导演：将小说叙事转译为**结构化分镜 JSON**（机器消费：审阅/机械校验/资产反推）+ markdown 渲染版（人读）。你产出对话+动作+情绪+运镜+资产清单，不生成角色卡/场景卡（那些由其他 skill 负责）。
 
 ## 数据源（二选一）
-1. **drama-scanner 输出**（推荐）：读取 `00-扫描索引.md` 的场景清单 + 情绪拐点索引 + 角色清单
+1. **drama-scanner 输出**（推荐）：读取 `.movie-create/scan-index.md` 的场景清单 + 情绪拐点索引 + 角色清单；旧项目只读回退 `00-扫描索引.md`
 2. **直接输入**：用户提供小说章节原文
 
 ## 输入要求
@@ -28,8 +28,9 @@ description: |
 ## 输出
 
 ```
-D:\Projects\TolariaData\MovieCreate\{小说名}\03-剧情脚本.md        ← markdown 渲染版（人读）
-D:\Projects\TolariaData\MovieCreate\{小说名}\03-分镜.json          ← 分镜 JSON（机器消费）
+D:\Projects\TolariaData\MovieCreate\{小说名}\.movie-create\screenplay.md  ← 内部 markdown 渲染版
+D:\Projects\TolariaData\MovieCreate\{小说名}\.movie-create\storyboard.json ← 内部分镜 JSON
+D:\Projects\TolariaData\MovieCreate\{小说名}\03-分镜提示词.md        ← 唯一可见分镜块
 ```
 
 ## 处理流程
@@ -42,8 +43,14 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\03-分镜.json          ← 分�
 场景切换即换场；同场景时间跳变拆两场。
 
 ### 第三步：分镜 JSON（按 references/script-spec.md 的 Schema）
-每镜必填：shot_id / time_range / duration（2-5s）/ scene / characters / props / shot_size / camera（一镜一运镜，起点-速度-终点）/ action（肢体级）/ dialogue（入镜前最终可表演文本）+ speaker / sfx / mood / **hook**（镜头钩子类型：定调/信息揭示/情绪爆发/悬念/笑点/反转/压迫/转场）/ **ref_anchors**（参考锚点，供视频引用）/ **purpose**（镜头目的）/ **screen_direction**（轴线，多主体时）/ **continuity.start-end**（边界锁）。
-**style 字段（扁平风格契约）**：正式分镜 JSON 的 `storyboard.meta` 必须使用 `style_source`、`style_id`、`style_name`。`style_source` 是完整风格定调的权威文件（默认 `00-风格定调.md`），`style_id` 是已匹配的 96 风格库文件键，`style_name` 仅供展示。预设风格三者均填写；电影提炼/自定义风格的 `style_id` 为 `null`；用户明确跳过时三者均为 `null`。选中风格但权威文件缺失时必须报告并停止，不得静默默认。
+#### 3A：draft shots
+先建立 draft shots 与唯一 `shot_id`。此阶段 `dialogue` 可为空或为 provisional 草稿，不能称最终台词、不能冻结；只建立镜头顺序、scene、characters、coverage 关联与可供 emotion 镜头 pass 使用的 shot_id。
+
+#### 3B：finalize
+在 dialogue 冻结前建议与 emotion 镜头 pass 返回后，合并并写入最终 `dialogue`、`speaker`、`mood`、`action`、`purpose`，随后冻结并渲染 `03-分镜提示词.md`。机械校验只对 3B 冻结结果执行。
+
+**3B 冻结结果每镜必填**：shot_id / time_range / duration（2-5s）/ scene / characters / props / shot_size / camera（一镜一运镜，起点-速度-终点）/ action（肢体级）/ dialogue（入镜前最终可表演文本）+ speaker / sfx / mood / **hook**（镜头钩子类型：定调/信息揭示/情绪爆发/悬念/笑点/反转/压迫/转场）/ **ref_anchors**（参考锚点，供视频引用）/ **purpose**（镜头目的）/ **screen_direction**（轴线，多主体时）/ **continuity.start-end**（边界锁）。3A draft 可暂缺 dialogue、speaker、mood；机械校验只接受 3B 冻结结果。
+**style 字段（扁平风格契约）**：正式分镜 JSON 的 `storyboard.meta` 必须使用 `style_source`、`style_id`、`style_name`。优先读取 `.movie-create/style-guide.md`；旧项目才回退 `00-风格定调.md`。无风格时三者均为 `null`，继续生成中性描述，不凭空编造 HEX。
 
 全片：**coverage** + **assets**（以下为机械校验消费的确切格式）：
 
@@ -85,7 +92,7 @@ assets: {
 `movie-create-drama-emotion: 情绪·强度`（10 情绪名+轻度/中度/高度）；情绪通过具体表情/手势/呼吸/视线呈现。
 
 ### 第七步：机械校验（调用 ../shared/scripts/validate_storyboard.cjs）
-分镜 JSON 产出后，跑 `node ../shared/scripts/validate_storyboard.cjs 03-分镜.json` 机械校验（新参数：`--dry-run` 只检查不写回；`--fix` 自动修复 + `--fix --backup` 修复前备份原文件）：
+分镜 JSON 产出后，优先跑 `node ../shared/scripts/validate_storyboard.cjs .movie-create/storyboard.json` 机械校验；仅旧项目没有内部文件时，才只读回退 `03-分镜.json`。新项目不得把旧路径当默认输出。
 - 时长归一化（镜头之和=目标时长，重算 time_range）
 - assets 反推（扫描 shots 字段核对 assets 一致性，遗漏/多余）
 - 台词检查（近似文本一致性检查；不声称逐字核对）
@@ -103,14 +110,14 @@ assets: {
 ### 第九步：渲染 markdown 版
 从 JSON 渲染 markdown（镜号/时间/景别/场景/角色/动作/台词/情绪/运镜表 + 资产清单），不手动维护。
 
-### 第十步：分镜脚本图提示词（正式交付物）
-读 `03-分镜.json` 的 `shots[]` + `00-风格定调.md`（或对应风格定调权威文件），逐镜渲染「分镜脚本图提示词」，产出 `分镜脚本图提示词.md`。这是**分镜块的正式交付物**——每一镜一条可粘贴到生图工具（MiniMax Hub / Seedance 图生图）的六段式提示词，让用户确定分镜画面。
+### 第十步：分镜提示词（唯一分镜块交付物；八宫格仅按需内嵌）
+读 `.movie-create/storyboard.json` 的 `shots[]` 与 `.movie-create/style-guide.md`（如有），逐镜渲染 `03-分镜提示词.md`。这是唯一的分镜块；只有用户明确请求时，才在该文件增加八宫格小节，不生成独立分镜图文件或视频模型专用标签。
 
 **六段式分镜图提示词（每镜一条，正文字幕用中文，结构名英文思想保持固定段序）**：
 
 | 段 | 信息来源 |
 |----|---------|
-| ① 风格与美学设定 | `00-风格定调.md` 母提示词 + 反禁（国风动画赛璐璐/墨线等） |
+| ① 风格与美学设定 | `.movie-create/style-guide.md` 母提示词 + 适用反向词；无风格则中性描述 |
 | ② 场景与叙事 | `shot.scene` + `shot.action` + `shot.dialogue` |
 | ③ 构图与空间关系 | `shot.camera`（景别/机位/角度）+ 场景空间 + 景别机位库（shot-size-library） |
 | ④ 光影与曝光 | 风格定调色彩 + 场景光位（日间平光/主光动机，附 HEX） |
@@ -118,13 +125,13 @@ assets: {
 | ⑥ 色彩系统 | 风格定调关键色彩 HEX（主/辅/点缀 + 面积 + 明度冷暖） |
 
 - 每镜用 `[镜N｜时间｜动作一句话]` 作标题；末段统一追加负面提示词（用 shared/negative-block + 风格定调反向词 + 任务特有负面）。
-- 若 `00-风格定调.md` 缺失或未加载 HEX 色彩系统，先报告并停止，不得凭空捏造色值（遵循版本管理与不编造原则）。
-- 分镜脚本图提示词引用角色/场景卡（reference_image）锁定角色外观与场景结构，提示词正文不重复描述已有参考图的外观（沿用一致性铁律）。
+- 无风格或无 HEX 时不编造色值；保留中性材质与光线描述。
+- 只使用人读的 `ref_anchors` 语义映射，不写入模型专用图片字段或 `<Picture N>`、`<图片N>`；目标模型标签由 OUT 编译阶段负责。
 
-## 🔴 CHECKPOINT · 分镜脚本图门控
-分镜脚本图提示词.md 渲染完成后，**停在此处等用户确认**（不要直接进视频/OUT）：
+## 🔴 CHECKPOINT · 分镜块门控
+03-分镜提示词.md 渲染完成后，**停在此处等用户确认**（不要直接进视频/OUT）：
 - [1] 继续（分镜画面 OK，进下游）
-- [2] 先看分镜脚本图提示词/先出图验证
+- [2] 先看 03-分镜提示词.md
 - [3] 调整（修改镜头动作/构图/色彩，重跑第十步）
 
 **用户未确认 → 默认停在门控，不自动推进到视频提示词阶段。**
@@ -145,8 +152,8 @@ assets: {
 - [ ] 台词忠实度保护通过：说话人、关系、事实因果、专名数字、线索、反转与情绪意图未改变
 - [ ] 压缩或合并未删除必要前因、setup、动机、道具交接或后果；原作自身问题已退回用户裁定
 - [ ] markdown 渲染版存在
-- [ ] 第十步分镜脚本图提示词.md 存在（逐镜六段式：风格/场景叙事/构图/光影/材质/色彩 + 负面）
-- [ ] 分镜脚本图提示词引用了风格定调 + 角色/场景卡，正文未重复已参考图外观
+- [ ] 03-分镜提示词.md 存在（逐镜六段式：风格/场景叙事/构图/光影/材质/色彩 + 适用限制）
+- [ ] 分镜提示词只使用语义 `ref_anchors`，未泄漏模型专用图片标签
 
 ## 反例黑名单
 

@@ -27,12 +27,12 @@ movie-create-design-scene → 中观+微观质感（在骨架确认后叠加）
 ## 输入要求
 - 场景名（必填）
 - 原文段落（必填）：该场景的空间/功能描写
-- 数据源（选填）：drama-scanner 的 00-扫描索引.md 场景清单
+- 数据源（选填）：drama-scanner 的 `.movie-create/scan-index.md` 场景清单（旧项目只读回退 `00-扫描索引.md`）
 
 ## 输出
 
 ```
-D:\Projects\TolariaData\MovieCreate\{小说名}\02-场景卡\{场景名}-布局.md
+D:\Projects\TolariaData\MovieCreate\{小说名}\.movie-create\scene-layout\{场景名}.md
 ```
 
 ## 处理流程
@@ -51,7 +51,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\02-场景卡\{场景名}-布局.
 - 光从南窗斜射，落在她脸上
 
 ### 第二步：空间蓝图（宏观结构）
-输出场景的整体空间设计，含 ASCII 平面图：
+输出场景的整体空间设计，含 ASCII 平面图，作为内部 `.movie-create/scene-layout/` 参考并由场景块吸收；不单独作为用户交付物：
 
 ```
 【场景名】空间蓝图

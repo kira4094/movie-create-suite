@@ -104,6 +104,15 @@ function validate(data, scriptText) {
       if (!matched && !(approximate && !system)) add(issues, 'medium', '近似文本一致性检查', shot.shot_id, short ? '短文本无法确认' : narrator ? '旁白无法确认' : '近似文本无法确认');
     });
   }
+  list.forEach((shot) => {
+    if (!shot || typeof shot.dialogue !== 'string' || shot.dialogue === '') return;
+    const speaker = String(shot.speaker || '').trim();
+    const narrator = speaker.includes('旁白') || speaker.toLowerCase().includes('narrator') || shot.type === 'narrator';
+    const system = speaker.includes('系统') || speaker.toLowerCase().includes('system') || shot.type === 'system';
+    if (narrator || system) return;
+    const characters = Array.isArray(shot.characters) ? shot.characters : [];
+    if (!speaker || !characters.includes(speaker)) add(issues, 'high', 'speaker', shot.shot_id, `speaker「${speaker || '空'}」必须属于当前镜头 characters[] 中的角色`);
+  });
   return { root, issues, shots: list, target, plan };
 }
 function canApply(result) { return result.plan && !result.issues.some((issue) => issue.severity === 'high' && issue.field !== 'duration' && issue.field !== 'time_range'); }

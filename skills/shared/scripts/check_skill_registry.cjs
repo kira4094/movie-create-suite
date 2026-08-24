@@ -88,9 +88,8 @@ for (const file of markdownFiles) {
 }
 for (const id of callTargets) if (!ids.includes(id)) errors.push(`调用目标未注册: ${id}`);
 
-// 产出型质量校验（2026-08-23）：角色卡/场景卡铁律机械校验
-// 扫描 character/scene skill 目录下的实际产出卡（若存在），用 validate_* 脚本校验
-// 即使无产出卡，只要 skill 存在即校验脚本应存在
+// 结构校验（2026-08-23）：确认角色/场景 validator 文件存在且可被 Node 解析。
+// 本脚本不扫描用户产出，也不宣称完成角色卡/场景卡质量验收；具体 fixture 测试由独立测试命令负责。
 const { execSync } = require('child_process');
 const validatorScripts = {
   'movie-create-design-character': 'validate_character_card.cjs',
@@ -107,4 +106,4 @@ for (const [skillDir, validator] of Object.entries(validatorScripts)) {
 
 console.log(`注册表：${entries.length} 个条目；实际技能：${actual.length} 个`);
 if (errors.length) { console.error(errors.map(error => `- ${error}`).join('\n')); process.exit(1); }
-console.log('通过：名称、注册表覆盖、依赖、风格路由和产出型校验脚本一致。');
+console.log('通过：名称、注册表覆盖、依赖、风格路由，以及 validator 存在且可解析。');

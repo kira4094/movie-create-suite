@@ -6,18 +6,18 @@
 
 | 层 | 技能 | 用途 |
 |---|---|---|
-| ENTRY | `movie-create-entry` | 全流程入口编排 |
-| L1 | `movie-create-drama-story` | AI 创作故事 |
-| L1 | `movie-create-drama-scanner` | 小说扫描索引 |
-| L1 | `movie-create-drama-script` | 生成分镜与剧情脚本 |
-| L1 | `movie-create-drama-review` | 分镜审阅闭环 |
-| L1 | `movie-create-drama-emotion` | 情绪时间轴 |
-| L1 | `movie-create-drama-dialogue` | 配音台词表 |
-| L2 | `movie-create-design-style` | 电影参考风格提炼（路径 A） |
-| L2 | `movie-create-design-preset` | 96 风格库预设选择（路径 B） |
-| L2 | `movie-create-design-scene-layout` | 场景空间蓝图 |
-| L2 | `movie-create-design-character` | 角色卡 |
-| L2 | `movie-create-design-scene` | 场景卡 |
-| OUT | `movie-create-out-video-director` | 视频提示词 |
+| ENTRY | `movie-create-entry` | 编排四块交付；内部态统一放 `.movie-create/` |
+| L1 | `movie-create-drama-story` | 生成 `.movie-create/source/story.md`，服务后续四块 |
+| L1 | `movie-create-drama-scanner` | 生成 `.movie-create/scan-index.md`，服务角色/场景/分镜 |
+| L1 | `movie-create-drama-script` | 唯一生成 `.movie-create/storyboard.json` 与 `03-分镜提示词.md` |
+| L1 | `movie-create-drama-review` | 审阅内部 storyboard，结果写 `.movie-create/review.md` |
+| L1 | `movie-create-drama-emotion` | 内存情绪接口，注入角色峰值、分镜 mood/action/purpose 与视频反应 |
+| L1 | `movie-create-drama-dialogue` | 冻结前建议、冻结后逐镜 voice directives，注入视频块 |
+| L2 | `movie-create-design-style` | 生成 `.movie-create/style-guide.md`，服务角色/场景/分镜/视频 |
+| L2 | `movie-create-design-preset` | 选择预设并写入内部风格指南，服务四块 |
+| L2 | `movie-create-design-scene-layout` | 生成 `.movie-create/scene-layout/`，由场景块吸收 |
+| L2 | `movie-create-design-character` | 生成用户交付 `01-角色提示词/` |
+| L2 | `movie-create-design-scene` | 生成用户交付 `02-场景提示词/` |
+| OUT | `movie-create-out-video-director` | 消费冻结分镜/情绪/对白，生成用户交付 `04-视频提示词.txt` |
 
 入口风格路由：A 调用 `movie-create-design-style`；B 调用 `movie-create-design-preset`；C 是自定义/题材推荐，不伪装成 A/B 调用。

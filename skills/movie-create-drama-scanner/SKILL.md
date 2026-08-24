@@ -25,8 +25,10 @@ description: |
 ```
 D:\Projects\TolariaData\MovieCreate\{小说名}\
 ├── README.md            ← 扫描概览 + 索引总表（各 skill 的入口）
-└── 00-扫描索引.md        ← 五类清单主文件
+└── .movie-create/scan-index.md  ← 五类清单主文件
 ```
+
+新项目优先写入 `.movie-create/scan-index.md`；旧项目的 `00-扫描索引.md` 只读回退，不自动移动、覆盖或删除。
 
 > 若用户指定子目录（如 Realtest/），项目建在 `{根}/{子目录}/{小说名}/`。
 
