@@ -1,0 +1,61 @@
+[
+  {
+    "name": "完整30秒Seedance恐怖直接模式",
+    "mode": "direct",
+    "input_complete": true,
+    "applicable_skills": ["movie-create-drama-story", "movie-create-drama-scanner", "movie-create-design-preset", "movie-create-drama-emotion角色pass", "movie-create-design-scene-layout", "movie-create-design-character", "movie-create-design-scene", "movie-create-drama-script 3A", "movie-create-drama-dialogue建议", "movie-create-drama-emotion镜头pass", "movie-create-drama-script 3B", "validate_storyboard", "movie-create-drama-review PASS", "movie-create-drama-dialogue voice", "movie-create-out-video-director"],
+    "forbidden_skills": ["movie-create-design-style"],
+    "stop_reason": null,
+    "visible_outputs": ["01-角色提示词", "02-场景提示词", "03-分镜提示词.md", "04-视频提示词.txt"],
+    "expected": {"model": "Seedance", "aspect": "9:16", "duration_seconds": 30, "style_route": "D"}
+  },
+  {
+    "name": "完整45秒H3 3D直接模式",
+    "mode": "direct",
+    "input_complete": true,
+    "applicable_skills": ["movie-create-drama-story", "movie-create-drama-scanner", "movie-create-design-preset", "movie-create-drama-emotion角色pass", "movie-create-design-scene-layout", "movie-create-design-character", "movie-create-design-scene", "movie-create-drama-script 3A", "movie-create-drama-dialogue建议", "movie-create-drama-emotion镜头pass", "movie-create-drama-script 3B", "validate_storyboard", "movie-create-drama-review PASS", "movie-create-drama-dialogue voice", "movie-create-out-video-director"],
+    "forbidden_skills": ["movie-create-design-style"],
+    "stop_reason": null,
+    "visible_outputs": ["01-角色提示词", "02-场景提示词", "03-分镜提示词.md", "04-视频提示词.txt"],
+    "expected": {"model": "MiniMax H3", "aspect": "9:16", "duration_seconds": 45, "style_route": "D"}
+  },
+  {
+    "name": "带原文改编直接模式",
+    "mode": "direct",
+    "input_complete": true,
+    "applicable_skills": ["movie-create-drama-scanner", "movie-create-design-preset", "movie-create-drama-emotion角色pass", "movie-create-design-scene-layout", "movie-create-design-character", "movie-create-design-scene", "movie-create-drama-script 3A", "movie-create-drama-dialogue建议", "movie-create-drama-emotion镜头pass", "movie-create-drama-script 3B", "validate_storyboard", "movie-create-drama-review PASS", "movie-create-drama-dialogue voice", "movie-create-out-video-director"],
+    "forbidden_skills": ["movie-create-drama-story", "movie-create-design-style"],
+    "stop_reason": null,
+    "visible_outputs": ["01-角色提示词", "02-场景提示词", "03-分镜提示词.md", "04-视频提示词.txt"],
+    "expected": {"model": "Seedance", "aspect": "16:9", "source_range": "第1-3章", "style_route": "B"}
+  },
+  {
+    "name": "改编缺原文只问源材料",
+    "mode": "direct",
+    "input_complete": false,
+    "applicable_skills": [],
+    "forbidden_skills": ["movie-create-drama-story", "movie-create-drama-scanner", "movie-create-design-character", "movie-create-design-scene", "movie-create-drama-script", "movie-create-out-video-director"],
+    "stop_reason": "缺少实际原文或明确改编范围；仅提出一个源材料问题",
+    "visible_outputs": [],
+    "questions": ["请提供实际原文或明确改编章节范围？"]
+  },
+  {
+    "name": "素材映射冲突暂停",
+    "mode": "direct",
+    "input_complete": false,
+    "applicable_skills": ["movie-create-drama-scanner", "movie-create-design-character", "movie-create-design-scene", "movie-create-drama-script", "validate_storyboard", "movie-create-drama-review PASS"],
+    "forbidden_skills": ["movie-create-out-video-director"],
+    "stop_reason": "同一参考素材无法安全映射到主体；暂停受影响阶段，不生成04",
+    "visible_outputs": ["01-角色提示词", "02-场景提示词", "03-分镜提示词.md"]
+  },
+  {
+    "name": "显式协作审阅逐层停",
+    "mode": "collaborative",
+    "input_complete": true,
+    "applicable_skills": ["movie-create-drama-story", "movie-create-drama-scanner", "movie-create-design-preset", "movie-create-design-scene-layout", "movie-create-design-character", "movie-create-design-scene"],
+    "forbidden_skills": ["movie-create-design-style"],
+    "stop_reason": "用户明确要求逐层确认；在美术层边界暂停",
+    "visible_outputs": ["01-角色提示词", "02-场景提示词"],
+    "pause_points": ["风格定调后", "美术层产出后"]
+  }
+]

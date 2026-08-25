@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // validate_character_card.cjs — 角色卡铁律机械校验
-// 校验：四Part全量+顺序 / 背景纯色黑名单 / Part3六格 / 技能0 / 下区裁切
+// 校验：按模式矩阵推导 Part 顺序 / 背景纯色黑名单 / Part3六格 / 技能0 / 下区裁切
 // 用法：node validate_character_card.cjs <角色卡.md> [--fix-print]
 const fs = require('fs');
 const file = process.argv[2];
@@ -27,8 +27,12 @@ if (quickRequested && qualification) {
 if (!hasMode) issues.push('FAIL 执行档位：缺少标准/制作/快速标记');
 const matches = [...s.matchAll(/^##\s+Part\s+(\d)\b[^\n]*\n([\s\S]*?)(?=^##\s+Part\s+\d\b|(?![\s\S]))/gmi)];
 const parts = new Map(matches.map(m => [Number(m[1]), m[2]]));
-const exempt = /已省略：Part\s*4（用户明确豁免）/.test(s);
-const expected = quickRequested ? [1,3] : (exempt ? [1,2,3] : [1,2,3,4]);
+const omitted = new Set([...s.matchAll(/已省略：Part\s*([234])（用户明确豁免）/g)].map(m => Number(m[1])));
+if (/已省略：Part\s*1（用户明确豁免）/.test(s)) issues.push('FAIL Part1：不可豁免');
+if (quick && omitted.size > 0) issues.push('FAIL 快速档位：不得使用逐项已省略标记，仅使用模式豁免：Part2、Part4');
+if (quick && omitted.has(3)) issues.push('FAIL 快速档位：Part3不可省略');
+const expected = quick ? [1,3] : [1,2,3,4].filter(n => !omitted.has(n));
+if (expected.length === 0 || expected[0] !== 1) issues.push('FAIL Part 顺序：Part1必须存在且位于首位');
 if (matches.map(m => Number(m[1])).join(',') !== expected.join(',')) issues.push(`FAIL Part 顺序或数量：应为 ${expected.join('→')}`);
 for (const n of expected) {
   const body = parts.get(n) || '';
@@ -42,5 +46,5 @@ const positive = s.split(/\r?\n/).filter(line => /背景/.test(line) && !/负面
 for (const word of ['森林','山水','城市','庭院','宫殿','场景背景']) if (positive.includes(word)) issues.push(`FAIL 背景正向段含场景词「${word}」`);
 if (!/纯色/.test(positive)) issues.push('FAIL 背景正向段缺少纯色约束');
 
-if (issues.length === 0) console.log(`PASS: ${file}（四Part/背景纯色/Part3六格/技能0 全合格）`);
+if (issues.length === 0) console.log(`PASS: ${file}（模式矩阵/背景纯色/Part3六格/技能0 全合格）`);
 else { console.log(`FAIL: ${file}\n` + issues.join('\n')); process.exit(1); }

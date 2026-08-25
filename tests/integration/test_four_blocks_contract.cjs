@@ -6,6 +6,8 @@ const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/four-b
 assert.deepStrictEqual(fixture.visible, ['01-角色提示词','02-场景提示词','03-分镜提示词.md','04-视频提示词.txt']);
 const read = p => fs.readFileSync(path.join(root, p), 'utf8');
 const entry = read('skills/movie-create-entry/SKILL.md');
+const styleTemplate = read('skills/shared/风格定调模板.md');
+const registryDoc = read('skills/shared/skill-registry.md');
 const script = read('skills/movie-create-drama-script/SKILL.md');
 const out = read('skills/movie-create-out-video-director/SKILL.md');
 const seedance = read('skills/movie-create-out-video-director/references/seedance-output-spec.md');
@@ -22,9 +24,58 @@ const absentTextFixture = fs.readFileSync(path.join(__dirname, 'fixtures/visible
 for (const term of ['无关文字', '乱码', '水印', '外加字幕条']) assert(absentTextFixture.includes(term), `无剧情文字 fixture 缺少防护: ${term}`);
 assert(fixture.visible.every(x => entry.includes(x)), 'entry must expose four visible blocks');
 assert(fixture.internal.every(x => entry.includes(x)), 'entry must expose internal paths');
+assert(entry.includes('直接模式（默认）') && entry.includes('协作审阅模式'), 'entry defines adaptive execution modes');
+assert(entry.includes('真实歧义只提出最小问题') && entry.includes('不重跑无关上游'), 'entry limits questions and downstream recovery');
+for (const route of ['路径A：','路径B：','路径C：跳过风格','路径D：自定义风格或题材推荐']) assert(entry.includes(route), `entry style route missing: ${route}`);
+for (const doc of [styleTemplate, registryDoc]) {
+  assert(!doc.includes('三选一'), 'shared style contract must not retain three-route wording');
+  assert(!/路径C[^\n]*(题材推荐|自定义)/.test(doc), 'shared style contract must not assign legacy C semantics');
+  for (const route of ['A', 'B', 'C', 'D']) assert(doc.includes(route), `shared style contract missing route ${route}`);
+}
+assert(styleTemplate.includes('C：跳过风格') && styleTemplate.includes('D：自定义或题材推荐'), 'style template routes aligned');
+assert(registryDoc.includes('C=明确跳过风格') && registryDoc.includes('D=自定义或题材推荐'), 'registry routes aligned');
+assert(entry.includes('不要生成图片') && entry.includes('只产文字提示词'), 'entry clarifies text-only delivery');
 for (const bad of fixture.forbidden) assert(!entry.includes(bad), `entry leaks ${bad}`);
 assert(script.includes('03-分镜提示词.md') && script.includes('唯一分镜块'), 'script owns storyboard prompt block');
 assert(!read('skills/movie-create-design-character/SKILL.md').includes('快速条件：已满足'), 'character Skill does not advertise legacy quick marker');
+const character = read('skills/movie-create-design-character/SKILL.md');
+const characterSpec = read('skills/movie-create-design-character/references/character-card-spec.md');
+assert(character.includes('Part 矩阵唯一权威') && characterSpec.includes('按模式矩阵输出 Part'), 'character Part matrix is documented');
+assert(character.includes('可选扩展三视图') && character.includes('标准 Part2 多视图'), 'Part2 and optional three-view extension are distinct');
+assert(/Part\s*3 六格/.test(character) && !/Part\s*3 十格/.test(character) && !characterSpec.includes('2行×5列') && !characterSpec.includes('十情绪表情卡'), 'Part3 fixed six-grid contract has no ten-grid legacy wording');
+assert(!character.includes('禁止不提问直接默认') && !character.includes('产出提示词前必须先问清需求'), 'character direct mode has no unconditional pre-question gate');
+assert(!read('skills/movie-create-drama-story/SKILL.md').includes('列一版配置让用户确认'), 'story direct mode has no unconditional configuration confirmation gate');
+const story = read('skills/movie-create-drama-story/SKILL.md');
+const scene = read('skills/movie-create-design-scene/SKILL.md');
+assert(story.includes('仅适用于协作审阅模式或信息不全') && story.includes('不得因 10 组选项未逐项选择停下'), 'story question loop is mode-aware');
+assert(!story.includes('提问式交互（核心，第一步强制）') && !story.includes('逐项追问未定选项**（每次只问 1 项，按优先级顺序）'), 'story has no unconditional first-step gate');
+assert(!story.includes('每集 3 分钟节奏') && story.includes('15–180 秒'), 'story has dynamic duration rhythm, not fixed three-minute rhythm');
+assert(scene.includes('直接模式未指定人物时默认空镜且不提问') && scene.includes('用户已明确要求带人物时直接保留带人物且不提问'), 'scene person presence gate is mode-aware');
+assert(!scene.includes('生成场景卡前先问清"要不要带人物"'), 'scene has no unconditional person question');
+assert(scene.includes('用户已明确要求带人物时直接保留带人物且不提问') && scene.includes('仅镜头需求/资产关系无法判断'), 'scene preserves explicit people branch without re-questioning');
+assert(!character.includes('默认写实真人 + 标注「风格可换」'), 'character no longer forces realistic-human fallback');
+assert(characterSpec.includes('优先继承入口与 `.movie-create/style-guide.md`') && !characterSpec.includes('美术风格必须先确认'), 'character style source is mode-aware');
+assert(read('skills/movie-create-drama-story/SKILL.md').includes('15–30 秒') && read('skills/shared/dramaturgy-planning.md').includes('31–60 秒'), 'short-duration envelopes are synchronized');
+const adaptiveScenarios = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/adaptive-mode-scenarios.json'), 'utf8'));
+assert.strictEqual(adaptiveScenarios.length, 6, 'adaptive mode fixture covers six required behavior scenarios');
+for (const scenario of adaptiveScenarios) {
+  assert(['direct', 'collaborative'].includes(scenario.mode), `${scenario.name}: mode declared`);
+  assert(Array.isArray(scenario.applicable_skills) && Array.isArray(scenario.forbidden_skills), `${scenario.name}: skill calls declared`);
+  for (const forbidden of scenario.forbidden_skills) assert(!scenario.applicable_skills.includes(forbidden), `${scenario.name}: mutually exclusive skill was mechanically co-called: ${forbidden}`);
+  assert(Array.isArray(scenario.visible_outputs), `${scenario.name}: visible outputs declared`);
+  if (scenario.mode === 'direct' && scenario.input_complete && !scenario.stop_reason) {
+    assert.deepStrictEqual(scenario.visible_outputs, fixture.visible, `${scenario.name}: complete direct mode must deliver exactly four blocks`);
+    for (const skill of ['movie-create-drama-emotion角色pass', 'movie-create-design-scene-layout', 'movie-create-design-character', 'movie-create-design-scene', 'movie-create-drama-script 3A', 'movie-create-drama-script 3B', 'validate_storyboard', 'movie-create-drama-review PASS', 'movie-create-drama-dialogue voice', 'movie-create-out-video-director']) assert(scenario.applicable_skills.includes(skill), `${scenario.name}: applicable Skill bypassed: ${skill}`);
+  }
+  if (scenario.name === '带原文改编直接模式') assert(!scenario.applicable_skills.includes('movie-create-drama-story'), 'adaptation must not call story generation');
+  if (scenario.name === '改编缺原文只问源材料') {
+    assert.strictEqual(scenario.questions.length, 1, 'missing adaptation source asks exactly one question');
+    assert.deepStrictEqual(scenario.visible_outputs, [], 'missing source delivers no visible block');
+  }
+  if (scenario.name === '素材映射冲突暂停') assert(!scenario.visible_outputs.includes('04-视频提示词.txt') && scenario.stop_reason.includes('受影响阶段'), 'mapping conflict pauses before 04');
+  if (scenario.mode === 'collaborative') assert(scenario.pause_points && scenario.pause_points.length > 0 && scenario.stop_reason.includes('逐层确认'), `${scenario.name}: collaborative mode retains layer pauses`);
+}
+console.log('自适应模式行为 fixture测试PASS：6 个场景（静态契约，非 LLM 真实生成实测）');
 const forbiddenField = ['reference', '_image'].join('');
 assert(!script.includes(forbiddenField), 'script must not leak model-specific image fields');
 assert(out.includes('04-视频提示词.txt') && out.includes('.movie-create/storyboard.json'), 'out uses V3 paths');
