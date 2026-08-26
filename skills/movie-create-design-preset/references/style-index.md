@@ -1,14 +1,14 @@
 # 美术风格库 · 风格索引（轻量目录）
 
-> **用途**：快速查 96 风格的核心哲学一句话。**详细 12 段定义见 shared/风格定义库/ 下对应文件**（001_cyberpunk.md 等）。
-> **系统框架**见 shared/style-system.md（STYLE_PROMPT_SYSTEM：12 段固定结构）。
-> **素材库**见 shared/vocabulary/（camera/color/lighting/material/character/environment/composition 7 库）。
-> **调研依据**见 shared/research-notes.md。
+> **用途**：快速查 96 风格的核心哲学一句话。**详细 12 段定义见 `../../shared/风格定义库/` 下对应文件**（001_cyberpunk.md 等）。
+> **系统框架**见 `../../shared/style-system.md`（STYLE_PROMPT_SYSTEM：12 段固定结构）。
+> **素材库**见 `../../shared/vocabulary/`（camera/color/lighting/material/character/environment/composition 7 库）。
+> **调研依据**见 `../../shared/research-notes.md`。
 
 ## 用法
 
-0. **文件名 slug 规则**：本表「风格」列为展示名（如 Cassette Futurism），对应文件名为小写下划线 slug（shared/风格定义库/007_cassette_futurism.md）——查表拿编号后按 `{编号}_{slug}.md` 读文件，slug = 展示名转小写、空格/连字符转下划线。
-1. 生成资产前：查本表找到风格 → 读 shared/风格定义库/{编号}_{风格}.md 的 12 段定义（核心哲学/母提示词/视觉张力/叙事机制/锚点/质量检查）
+0. **文件名 slug 规则**：本表「风格」列为展示名（如 Cassette Futurism），对应文件名为小写下划线 slug（`../../shared/风格定义库/007_cassette_futurism.md`）——查表拿编号后按 `{编号}_{slug}.md` 读文件，slug = 展示名转小写、空格/连字符转下划线。
+1. 生成资产前：查本表找到风格 → 读 `../../shared/风格定义库/{编号}_{风格}.md` 的 12 段定义（核心哲学/母提示词/视觉张力/叙事机制/锚点/质量检查）
 2. 风格段开头写该风格的「核心哲学一句话」锚定灵魂
 3. 材质/色彩/光影/空间按 12 段定义取，负面词用该风格的「禁止误区」
 
@@ -178,4 +178,4 @@
 | 2D | 禁 真人/写实/照片/3D渲染/游戏CG/粗线条/变形 |
 | 3D | 禁 真人/照片/纯2D插画/塑料感/贴图感 |
 
-> 每风格专属反向词见 shared/风格定义库/{编号}_{风格}.md 的「禁止误区」+「AI 生成提示词锚点·反向词」。
+> 每风格专属反向词见 `../../shared/风格定义库/{编号}_{风格}.md` 的「禁止误区」+「AI 生成提示词锚点·反向词」。

@@ -1,7 +1,7 @@
 ---
 name: movie-create-drama-script
 description: |
-  [L1] 剧情对话脚本/分镜生成：接收小说原文，产出分镜 JSON（含 purpose/continuity/coverage/assets 结构化字段，供机械校验与审阅闭环消费）+ markdown 渲染版——对话按角色列出、动作肢体级描述、情绪标注（movie-create-drama-emotion 格式）、台词入镜前一次必要口语化（shared/humanizer-zh）、每镜一运镜（shared/cinematography-handbook）。
+  [L1] 剧情对话脚本/分镜生成：接收小说原文，产出分镜 JSON（含 purpose/continuity/coverage/assets 结构化字段，供机械校验与审阅闭环消费）+ markdown 渲染版——对话按角色列出、动作肢体级描述、情绪标注（movie-create-drama-emotion 格式）、台词入镜前一次必要口语化（../shared/humanizer-zh.md）、每镜一运镜（../shared/cinematography-handbook.md）。
   核心方法论：分镜 JSON 为主（机器消费）markdown 并存（人读）、coverage 节拍覆盖防丢戏、continuity 边界锁保证跨镜一致、dialogue 为入镜前完成单次口语化后的最终可表演文本、一镜一运镜。
   当用户提到「剧本」「分场剧本」「剧情对话」「小说转剧本」「分镜」「分镜脚本」时使用。
   当用户提供小说章节，要求转成带对话/动作/情绪/运镜的结构化分镜剧本时使用。
@@ -92,7 +92,7 @@ assets: {
 `movie-create-drama-emotion: 情绪·强度`（10 情绪名+轻度/中度/高度）；情绪通过具体表情/手势/呼吸/视线呈现。
 
 ### 第七步：机械校验（调用 ../shared/scripts/validate_storyboard.cjs）
-分镜 JSON 产出后，优先跑 `node ../shared/scripts/validate_storyboard.cjs .movie-create/storyboard.json` 机械校验；仅旧项目没有内部文件时，才只读回退 `03-分镜.json`。新项目不得把旧路径当默认输出。
+分镜 JSON 产出后，优先由当前 runtime 以**本 Skill 目录为解析基准**运行 `node ../shared/scripts/validate_storyboard.cjs`；脚本文件路径相对本 Skill 目录解析，不假定用户项目 cwd。`.movie-create/storyboard.json` 参数则由 runtime 提供的**项目根目录**解析（不是 Skill 目录），仅旧项目没有内部文件时才只读回退 `03-分镜.json`。新项目不得把旧路径当默认输出。
 - 时长归一化（镜头之和=目标时长，重算 time_range）
 - assets 反推（扫描 shots 字段核对 assets 一致性，遗漏/多余）
 - 台词检查（近似文本一致性检查；不声称逐字核对）
@@ -124,7 +124,7 @@ assets: {
 | ⑤ 材质细节 | 风格定调关键材质（绢帛/赛璐璐/毛发/釉质等） |
 | ⑥ 色彩系统 | 风格定调关键色彩 HEX（主/辅/点缀 + 面积 + 明度冷暖） |
 
-- 每镜用 `[镜N｜时间｜动作一句话]` 作标题；末段统一追加负面提示词（用 shared/negative-block + 风格定调反向词 + 任务特有负面）。
+- 每镜用 `[镜N｜时间｜动作一句话]` 作标题；末段统一追加负面提示词（用 `../shared/negative-block.md` + 风格定调反向词 + 任务特有负面）。
 - 无风格或无 HEX 时不编造色值；保留中性材质与光线描述。
 - 只使用人读的 `ref_anchors` 语义映射，不写入模型专用图片字段或 `<Picture N>`、`<图片N>`；目标模型标签由 OUT 编译阶段负责。
 

@@ -19,12 +19,12 @@ description: |
 ```
 ┌─────────────────────────────────────────────────┐
 │ 入口：风格定调（scanner 扫描后执行，四选一）       │
-│   路径A：movie-create-design-style 提炼（电影参考图 → 分析 → │
+│   路径A：movie-create-design-style(mode=entry_style_guide) 提炼（电影参考图 → 分析 → │
 │          匹配 96 库最接近风格深化）               │
 │   路径B：movie-create-design-preset 直接选一（96 风格库查表） │
 │   路径C：跳过风格（中性描述，不调用风格 Skill）    │
 │   路径D：自定义风格或题材推荐（用户正向规则/可追溯预设） │
-│   ★ 产出：.movie-create/style-guide.md（全链继承） │
+│   ★ 唯一产出：.movie-create/style-guide.md（全链继承） │
 └─────────────────────────────────────────────────┘
               ↓ 继承风格定调（不重新选）
 ┌─────────────────────────────────────────────────┐
@@ -57,7 +57,7 @@ description: |
 movie-create-drama-scanner ── 全本扫描 → .movie-create/scan-index.md（角色/场景/情绪拐点/服装节点/道具清单）
    ▼
 ★ 风格定调（四选一）── → .movie-create/style-guide.md（全链继承）
-   │   路径A：movie-create-design-style 提炼（电影参考图→分析→匹配 96 库最接近风格）
+│   路径A：movie-create-design-style(mode=entry_style_guide) 提炼（电影参考图→分析→匹配 96 库最接近风格；唯一产出 `.movie-create/style-guide.md`，入口直接模式无本 Skill 子暂停）
    │   路径B：movie-create-design-preset 直接选一（96 风格库查表）
    │   路径C：跳过风格（中性描述，不调用风格 Skill）
    │   路径D：自定义风格或题材推荐（用户正向规则/可追溯预设）
@@ -163,7 +163,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 | L2 | movie-create-design-scene | 02-场景提示词/ | 场景块/场景提示词 |
 | L2 | movie-create-design-character | 01-角色提示词/ | 角色块/角色提示词 |
 | OUT | movie-create-out-video-director | 轻量任务：04-视频提示词.txt；复杂任务：.movie-create/video-plan.md + 04-视频提示词.txt | 分镜→编译前判断→（必要时规划）→视频提示词 |
-| — | shared/（共享层） | style-dna/负面块/运镜库/机械校验脚本 | 所有 skill 引用 |
+| — | `../shared/`（共享层） | style-dna/负面块/运镜库/机械校验脚本 | 所有 skill 引用 |
 
 ## 用户输入处理指令（激活后执行，问答式向导）
 
@@ -214,22 +214,23 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 严格按唯一权威顺序执行；仅协作审阅模式在层级边界门控。每步调用对应独立 Skill，**不自行生成**：scanner → 风格（可跳过）→ emotion 角色证据 pass → 角色/场景 → script 3A draft 建立 shot_id → dialogue 冻结前建议 + emotion 镜头 pass → script 3B 合并/冻结/渲染 → 机械校验 → review → PASS 后 dialogue voice directives → OUT。
 
 ### 第六步：交付（输出模板）
+
+### 最终可见交付边界（直接模式）
+直接模式最终响应只允许四块提示词：01-角色提示词、02-场景提示词、03-分镜提示词、04-视频提示词；可附一行标题或参数。禁止向用户输出 RUN_META、Skill 调用清单、QA/校验摘要、内部路径、内部状态、计划、Gate 或评测元数据；这些内容仅保留内部态。主链暂停由 entry 统一拥有，design-style 在入口直接模式不得设置子暂停。
+
 ```
 ## {小说名} · 影视化拆解完成
 
-### 产出清单
-| 资产 | 路径 | 状态 |
-|------|------|------|
-| 角色提示词 ×N（交付①） | 01-角色提示词/ | ✅ |
-| 场景提示词 ×N（交付②） | 02-场景提示词/ | ✅（含内部空间蓝图） |
-| 分镜提示词（交付③） | 03-分镜提示词.md | ✅（逐镜六段式） |
-| 视频提示词（交付④） | 04-视频提示词.txt | ✅（LOCKED 后，内化情绪/台词/配音参数） |
+### 01-角色提示词
+{角色提示词正文}
 
-> `.movie-create/scan-index.md`、`.movie-create/style-guide.md`、`.movie-create/storyboard.json`、`.movie-create/review.md` 与复杂任务的 `.movie-create/video-plan.md` 仅作为内部诊断态；用户主动询问时再披露，不列为常规成果。
+### 02-场景提示词
+{场景提示词正文}
 
-### 质量自查
-- 各 skill 质量清单是否全过？
-- 分镜 JSON 校验 verdict？
-- 未通过项：{列出 + 已打回重做/待用户处理}
+### 03-分镜提示词
+{分镜提示词正文}
+
+### 04-视频提示词
+{视频提示词正文}
 ```
-> 所有资产 = 文字提示词，跳转 MiniMax Hub / Seedance 生成图/视频。
+> 内部操作说明：完成四块文字提示词后，用户可自行跳转 MiniMax Hub / Seedance；该说明不属于直接交付正文。

@@ -50,12 +50,13 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\02-场景提示词\{场景名}.m
 
 ### 第〇·二步：美术风格四选一（与 character 同规则）
 **写画风锚定块之前先定风格来源**（四选一，互斥）：
-- **A. movie-create-design-style**：用户提供电影参考 → 调用该 Skill 提炼，风格块 = 其输出
+- **A. movie-create-design-style**：用户提供电影参考 → 单点无指南时调用 `movie-create-design-style(mode=standalone_style_guide)` 提炼，风格块 = 其输出
 - **B. 风格库预设**：用户说"选 XX 风格 / 风格库里的 XX" → 调用 **movie-create-design-preset**，取回风格块（锚定句+锚定词+反向词）注入本卡"风格与美学设定"段
 - **C. 跳过风格**：不调用 style-dna，使用中性材质、光线与空间关系，不写媒介默认。
 - **D. 自定义/题材推荐**：用户明确自定义风格或接受题材推荐时，可参考 style-dna；用户正向特征优先，删除冲突默认负面。
 - ⚠️ 选 A 不注 B/D 锚定词；选 B 不用 A 分析链路；选 C 不调用 style-dna；选 D 才参考 style-dna。
 > **继承风格定调（不重新选）**：优先读 `.movie-create/style-guide.md`——取「母提示词/视觉张力/关键材质/关键色彩/关键空间/禁止误区」；旧项目才只读回退 `00-风格定调.md`。无风格时使用中性描述，不凭空编造 HEX。
+> 完整管线已有 `.movie-create/style-guide.md` 时只读取继承，不调用或重新调度 `movie-create-design-style`；仅单点且无指南时才选择 A/B/C/D。单点选择 A 仅进入 `standalone_style_guide`，不得隐式进入 `standalone_style_production`。
 
 ### 第〇·三步：空镜/带人物判定（默认空镜）
 三分支判定：直接模式未指定人物时默认空镜且不提问；用户已明确要求带人物时直接保留带人物且不提问；仅镜头需求/资产关系无法判断，或处于协作审阅模式时询问：
