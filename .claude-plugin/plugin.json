@@ -5,6 +5,6 @@
   "homepage": "https://github.com/kira4094/movie-create-suite",
   "repository": "https://github.com/kira4094/movie-create-suite",
   "skills": [
-    "skills"
+    "./skills"
   ]
 }
