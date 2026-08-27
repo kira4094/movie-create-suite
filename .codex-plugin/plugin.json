@@ -1,0 +1,38 @@
+{
+  "name": "movie-create-suite",
+  "version": "0.33.1+20260826.2250",
+  "description": "AI 漫剧提示词生产管线：从小说或创意生成角色、场景、分镜和视频四块提示词交付。",
+  "author": {
+    "name": "GuoXiaoChun",
+    "email": "kirayamato1@vip.qq.com",
+    "url": "https://github.com/kira4094"
+  },
+  "homepage": "https://github.com/kira4094/movie-create-suite",
+  "repository": "https://github.com/kira4094/movie-create-suite",
+  "keywords": [
+    "movie",
+    "short-drama",
+    "prompt",
+    "storyboard",
+    "video"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Movie Create Suite",
+    "shortDescription": "生成角色、场景、分镜和视频四块短剧提示词。",
+    "longDescription": "将小说或创意转化为可直接用于 AI 漫剧生产的角色、场景、分镜和视频提示词，并在内部完成剧情扫描、风格、情绪、对白和质量审查。",
+    "developerName": "GuoXiaoChun",
+    "category": "Creative",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/kira4094/movie-create-suite",
+    "defaultPrompt": [
+      "把这篇小说转化为角色、场景、分镜和视频四块提示词。",
+      "根据这个短剧创意生成完整的四块制作提示词。",
+      "检查并优化这套短剧提示词的角色一致性和镜头可执行性。"
+    ],
+    "brandColor": "#7C3AED"
+  }
+}
