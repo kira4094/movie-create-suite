@@ -1,7 +1,7 @@
 {
-  "name": "kiray-movie",
+  "name": "movie-create-suite",
   "interface": {
-    "displayName": "Kiray Movie Plugins"
+    "displayName": "Movie Create Suite"
   },
   "plugins": [
     {
