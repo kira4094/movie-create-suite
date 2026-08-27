@@ -1,6 +1,6 @@
 {
   "name": "movie-create-suite",
-  "version": "0.33.1+20260826.2250",
+  "version": "0.35.1+20260827.2229",
   "description": "AI 漫剧提示词生产管线：从小说或创意生成角色、场景、分镜和视频四块提示词交付。",
   "author": {
     "name": "GuoXiaoChun",
