@@ -13,7 +13,7 @@ const sources = collectMarkdown(path.join(root, 'skills'));
 const ignored = raw => /^(?:https?:|file:|D:[\\/]|[A-Za-z]:[\\/])/.test(raw)
   || raw.includes('.movie-create')
   || raw.includes('01-角色提示词') || raw.includes('02-场景提示词')
-  || raw.includes('03-分镜提示词') || raw.includes('04-视频提示词');
+  || raw.includes('03-分镜脚本图提示词') || raw.includes('03-分镜提示词') || raw.includes('04-视频提示词');
 const clean = raw => raw.replace(/[`<>()\[\]，。；：！？（）【】》“”‘’「」]+$/g, '').replace(/^['"]|['"]$/g, '');
 const pattern = /(?:\.\.?\/|shared\/|references\/)[^\s`<>()[\]"'、，。；：！？（）【】《》“”‘’「」]+/g;
 const failures = [];

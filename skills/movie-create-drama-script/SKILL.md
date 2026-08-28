@@ -30,7 +30,7 @@ description: |
 ```
 D:\Projects\TolariaData\MovieCreate\{小说名}\.movie-create\screenplay.md  ← 内部 markdown 渲染版
 D:\Projects\TolariaData\MovieCreate\{小说名}\.movie-create\storyboard.json ← 内部分镜 JSON
-D:\Projects\TolariaData\MovieCreate\{小说名}\03-分镜提示词.md        ← 唯一可见分镜块
+D:\Projects\TolariaData\MovieCreate\{小说名}\03-分镜脚本图提示词.md  ← 唯一可见分镜块（旧名只读回退）
 ```
 
 ## 处理流程
@@ -47,7 +47,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\03-分镜提示词.md        ←
 先建立 draft shots 与唯一 `shot_id`。此阶段 `dialogue` 可为空或为 provisional 草稿，不能称最终台词、不能冻结；只建立镜头顺序、scene、characters、coverage 关联与可供 emotion 镜头 pass 使用的 shot_id。
 
 #### 3B：finalize
-在 dialogue 冻结前建议与 emotion 镜头 pass 返回后，合并并写入最终 `dialogue`、`speaker`、`mood`、`action`、`purpose`，随后冻结并渲染 `03-分镜提示词.md`。机械校验只对 3B 冻结结果执行。
+在 dialogue 冻结前建议与 emotion 镜头 pass 返回后，合并并写入最终 `dialogue`、`speaker`、`mood`、`action`、`purpose`，随后冻结并渲染 `03-分镜脚本图提示词.md`。机械校验只对 3B 冻结结果执行。
 
 **3B 冻结结果每镜必填**：shot_id / time_range / duration（2-5s）/ scene / characters / props / shot_size / camera（一镜一运镜，起点-速度-终点）/ action（肢体级）/ dialogue（入镜前最终可表演文本）+ speaker / sfx / mood / **hook**（镜头钩子类型：定调/信息揭示/情绪爆发/悬念/笑点/反转/压迫/转场）/ **ref_anchors**（参考锚点，供视频引用）/ **purpose**（镜头目的）/ **screen_direction**（轴线，多主体时）/ **continuity.start-end**（边界锁）。3A draft 可暂缺 dialogue、speaker、mood；机械校验只接受 3B 冻结结果。
 **style 字段（扁平风格契约）**：正式分镜 JSON 的 `storyboard.meta` 必须使用 `style_source`、`style_id`、`style_name`。优先读取 `.movie-create/style-guide.md`；旧项目才回退 `00-风格定调.md`。无风格时三者均为 `null`，继续生成中性描述，不凭空编造 HEX。
@@ -110,10 +110,10 @@ assets: {
 ### 第九步：渲染 markdown 版
 从 JSON 渲染 markdown（镜号/时间/景别/场景/角色/动作/台词/情绪/运镜表 + 资产清单），不手动维护。
 
-### 第十步：分镜提示词（唯一分镜块交付物；八宫格仅按需内嵌）
-读 `.movie-create/storyboard.json` 的 `shots[]` 与 `.movie-create/style-guide.md`（如有），逐镜渲染 `03-分镜提示词.md`。这是唯一的分镜块；只有用户明确请求时，才在该文件增加八宫格小节，不生成独立分镜图文件或视频模型专用标签。
+### 第十步：分镜脚本图提示词（唯一分镜块交付物）
+读 `.movie-create/storyboard.json` 的 `shots[]` 与 `.movie-create/style-guide.md`（如有），按镜头顺序渲染 `03-分镜脚本图提示词.md`。1镜=1×1、2镜=1×2、3–4镜=2×2、5–6镜=2×3、7–9镜=3×3，超过9镜分页，每页最多9格；每格必须映射现有 `shot_id`，不得新增剧情事实。旧 `03-分镜提示词.md` 仅只读兼容，禁止自动迁移、覆盖或删除。
 
-**六段式分镜图提示词（每镜一条，正文字幕用中文，结构名英文思想保持固定段序）**：
+**分镜脚本图提示词（每格一条，正文字幕用中文）**：
 
 | 段 | 信息来源 |
 |----|---------|
@@ -129,9 +129,9 @@ assets: {
 - 只使用人读的 `ref_anchors` 语义映射，不写入模型专用图片字段或 `<Picture N>`、`<图片N>`；目标模型标签由 OUT 编译阶段负责。
 
 ## 分镜块门控（按入口模式触发）
-03-分镜提示词.md 渲染完成后，协作审阅模式或用户明确要求先看时，停在此处等用户确认（不要直接进视频/OUT）：
+03-分镜脚本图提示词.md 渲染完成后，协作审阅模式或用户明确要求先看时，停在此处等用户确认（不要直接进视频/OUT）：
 - [1] 继续（分镜画面 OK，进下游）
-- [2] 先看 03-分镜提示词.md
+- [2] 先看 03-分镜脚本图提示词.md
 - [3] 调整（修改镜头动作/构图/色彩，重跑第十步）
 
 直接模式完成机械校验与 review 后自动进入视频/OUT；真实歧义仍只暂停受影响阶段。
@@ -152,7 +152,7 @@ assets: {
 - [ ] 台词忠实度保护通过：说话人、关系、事实因果、专名数字、线索、反转与情绪意图未改变
 - [ ] 压缩或合并未删除必要前因、setup、动机、道具交接或后果；原作自身问题已退回用户裁定
 - [ ] markdown 渲染版存在
-- [ ] 03-分镜提示词.md 存在（逐镜六段式：风格/场景叙事/构图/光影/材质/色彩 + 适用限制）
+- [ ] 03-分镜脚本图提示词.md 存在（按 shot_id 的分页宫格 + 静态视觉语义）
 - [ ] 分镜提示词只使用语义 `ref_anchors`，未泄漏模型专用图片标签
 
 ## 反例黑名单

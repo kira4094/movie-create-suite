@@ -32,7 +32,7 @@ description: |
 }
 ```
 
-entry 在角色块生成前调用角色证据 pass，角色块消费每名角色六个实际峰值；script 3A 建立 draft shots 后才调用镜头证据 pass，script 3B 将非空人物表演镜的 directive 写入现有 `mood`、`action`、`purpose`，并渲染到 `03-分镜提示词.md`。空镜与纯环境镜保持无情绪注入；OUT 只消费冻结后的可见反应。
+entry 在角色块生成前调用角色证据 pass，角色块消费每名角色六个实际峰值；script 3A 建立 draft shots 后才调用镜头证据 pass，script 3B 将非空人物表演镜的 directive 写入现有 `mood`、`action`、`purpose`，并渲染到 `03-分镜脚本图提示词.md`（旧 `03-分镜提示词.md` 仅只读兼容）。空镜与纯环境镜保持无情绪注入；OUT 只消费冻结后的可见反应。
 不独立落盘情绪文件。
 
 ## 处理流程

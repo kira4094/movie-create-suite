@@ -4,7 +4,7 @@ const assert = require('assert');
 const { spawnSync } = require('child_process');
 const root = path.resolve(__dirname, '../..');
 const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/four-blocks-contract.json'), 'utf8'));
-assert.deepStrictEqual(fixture.visible, ['01-角色提示词','02-场景提示词','03-分镜提示词.md','04-视频提示词.txt']);
+assert.deepStrictEqual(fixture.visible, ['01-角色提示词','02-场景提示词','03-分镜脚本图提示词.md','04-视频提示词.txt']);
 const read = p => fs.readFileSync(path.join(root, p), 'utf8');
 const entry = read('skills/movie-create-entry/SKILL.md');
 const styleSkill = read('skills/movie-create-design-style/SKILL.md');
@@ -38,7 +38,7 @@ const directTemplateEnd = entry.indexOf('```', directTemplateStart + 3);
 assert(directTemplateStart >= 0 && directTemplateEnd > directTemplateStart, 'direct output template is present');
 const directTemplate = entry.slice(directTemplateStart, directTemplateEnd);
 for (const forbidden of ['产出清单', '质量自查', '| 资产 | 路径 | 状态 |', '.movie-create/']) assert(!directTemplate.includes(forbidden), `direct output template leaks internal field: ${forbidden}`);
-for (const block of ['### 01-角色提示词', '### 02-场景提示词', '### 03-分镜提示词', '### 04-视频提示词']) assert(directTemplate.includes(block), `direct output template missing ${block}`);
+for (const block of ['### 01-角色提示词', '### 02-场景提示词', '### 03-分镜脚本图提示词', '### 04-视频提示词']) assert(directTemplate.includes(block), `direct output template missing ${block}`);
 assert(styleSkill.includes('入口 A 内部匹配 96 库不调用 `movie-create-design-preset`'), 'entry A and preset remain mutually exclusive');
 const localPathCheck = spawnSync(process.execPath, [path.join(__dirname, 'test_local_resource_paths.cjs')], { encoding: 'utf8' });
 assert.strictEqual(localPathCheck.status, 0, `local resource path checker failed:\n${localPathCheck.stdout}\n${localPathCheck.stderr}`);
@@ -63,7 +63,7 @@ assert(styleTemplate.includes('C：跳过风格') && styleTemplate.includes('D�
 assert(registryDoc.includes('C=明确跳过风格') && registryDoc.includes('D=自定义或题材推荐'), 'registry routes aligned');
 assert(entry.includes('不要生成图片') && entry.includes('只产文字提示词'), 'entry clarifies text-only delivery');
 for (const bad of fixture.forbidden) assert(!entry.includes(bad), `entry leaks ${bad}`);
-assert(script.includes('03-分镜提示词.md') && script.includes('唯一分镜块'), 'script owns storyboard prompt block');
+assert(script.includes('03-分镜脚本图提示词.md') && script.includes('唯一分镜块'), 'script owns storyboard prompt block');
 assert(script.includes('脚本文件路径相对本 Skill 目录解析') && script.includes('项目根目录') && script.includes('不是 Skill 目录'), 'script validator and storyboard argument bases are distinct');
 assert(read('skills/movie-create-drama-script/references/script-spec.md').includes('`../../shared/negative-block.md`'), 'script spec negative block resolves to shared resource');
 assert(!read('skills/movie-create-design-character/SKILL.md').includes('快速条件：已满足'), 'character Skill does not advertise legacy quick marker');
@@ -117,10 +117,11 @@ for (const token of ['<Picture N>', '<图片N>', '<视频N>', '<音频N>', '严�
 assert(seedance.includes('六段式') && seedance.includes('编辑') && seedance.includes('延长') && seedance.includes('组合') && seedance.includes('Seedance QA'), 'Seedance reference is complete');
 assert(h3.includes('T2VA') && h3.includes('I2VA') && h3.includes('FL2VA') && h3.includes('L2VA') && h3.includes('Ref2VA') && h3.includes('<scenetrans>') && h3.includes('<cutoff>') && h3.includes('H3 QA'), 'H3 reference is complete');
 assert(/OUT 只消费[\s\S]*04-视频提示词\.txt/.test(out), 'OUT responsibility must resolve to the video block');
-assert(/唯一分镜块[\s\S]*明确请求时[\s\S]*八宫格/.test(script), 'optional grid responsibility must remain in script block');
+assert(/分镜脚本图提示词[\s\S]*超过9镜分页/.test(script), 'script owns paged storyboard grid responsibility');
+assert(out.includes('不得读取、复制或反向解析 `03-分镜脚本图提示词.md`') && out.includes('旧 `03-分镜提示词.md` 同样只读兼容'), 'OUT explicitly excludes both storyboard prompt filenames');
 const actualRoot = path.join(__dirname, 'fixtures/actual-project');
 const actualVisible = fs.readdirSync(actualRoot).filter(name => !name.startsWith('.'));
-assert.deepStrictEqual(actualVisible.sort(), ['01-角色提示词','02-场景提示词','03-分镜提示词.md','04-视频提示词.txt'].sort(), 'actual fixture root must contain only four blocks');
+assert.deepStrictEqual(actualVisible.sort(), ['01-角色提示词','02-场景提示词','03-分镜脚本图提示词.md','04-视频提示词.txt'].sort(), 'actual fixture root must contain only four blocks');
 const actualStoryboard = JSON.parse(fs.readFileSync(path.join(actualRoot, '.movie-create/storyboard.json'), 'utf8'));
 const actualVoice = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/calls/voice-directives.json'), 'utf8'));
 assert(!fs.existsSync(path.join(actualRoot, '.movie-create/voice-directives.json')), 'actual project must not contain voice directive sidecar');
@@ -138,7 +139,7 @@ assert.strictEqual(actualStoryboard.shots[1].mood, '', 'pure environment shot ha
 const forbiddenVoiceField = ['voice', '_directive'].join('');
 assert(!(forbiddenVoiceField in actualStoryboard.shots[0]) && !(forbiddenVoiceField in actualStoryboard.shots[1]), 'storyboard schema has no voice directive field');
 assert(!fs.existsSync(path.join(actualRoot, '03-分镜.json')), 'actual fixture has no legacy storyboard output');
-const actualFiles = [path.join(actualRoot, '01-角色提示词/林.md'), path.join(actualRoot, '02-场景提示词/室内.md'), path.join(actualRoot, '03-分镜提示词.md'), path.join(actualRoot, '04-视频提示词.txt')];
+const actualFiles = [path.join(actualRoot, '01-角色提示词/林.md'), path.join(actualRoot, '02-场景提示词/室内.md'), path.join(actualRoot, '03-分镜脚本图提示词.md'), path.join(actualRoot, '04-视频提示词.txt')];
 const actualTexts = actualFiles.map(file => fs.readFileSync(file, 'utf8'));
 assert(actualTexts[3].includes('<Picture 1>'), 'only video block contains model reference tag');
 assert(actualTexts.slice(0, 3).every(text => !text.includes('<Picture 1>')), 'non-video blocks stay model neutral');
@@ -148,6 +149,9 @@ assert(actualStoryboard.shots[0].mood === '恐惧·中度' && actualStoryboard.s
 assert(actualTexts[2].includes(visibleReaction), '03 carries visible reaction from character evidence');
 assert(actualTexts[3].includes(visibleReaction), '04 compiles the same visible reaction');
 assert(actualTexts[2].includes('周侧耳倾听') && actualTexts[3].includes('倾听者反应：周侧耳倾听'), 'listener reaction is visible in 03 and 04');
+assert(actualTexts[2].includes('第1页：1行×2列2格'), '03 uses the frozen first-page grid');
+assert.deepStrictEqual([...actualTexts[2].matchAll(/shot_id=(S\d+-\d+)/g)].map(m => m[1]), actualStoryboard.shots.map(s => s.shot_id), '03 shot_id order matches storyboard');
+assert.strictEqual((actualTexts[2].match(/shot_id=/g) || []).length, actualStoryboard.shots.length, '03 has one explicit shot_id per grid cell');
 const voiceSource = [
   {shot_id:'S02-01', speaker:'林', dialogue:'第一句'},
   {shot_id:'S02-02', speaker:'林', dialogue:'第二句'},

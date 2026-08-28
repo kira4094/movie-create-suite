@@ -9,6 +9,6 @@
   {"name":"Part4豁免","type":"fixture","file":"tests/cards/fixtures/character/exempt-part4.md","expect":"用户明确豁免"},
   {"name":"emotion三处注入且空镜无注入","type":"doc-all","file":"skills/movie-create-drama-emotion/SKILL.md","expect":["character_peak_expressions[]","shot_emotion_directives[]","空镜"]},
   {"name":"dialogue逐镜冻结","type":"doc-all","file":"skills/movie-create-drama-dialogue/SKILL.md","expect":["shot_id","逐字一致","dialogue` 为空"]},
-  {"name":"script独占分镜及按需八宫格","type":"doc-all","file":"skills/movie-create-drama-script/SKILL.md","expect":["唯一分镜块","明确请求时","03-分镜提示词.md"]},
+  {"name":"script生成分镜脚本图宫格","type":"doc-all","file":"skills/movie-create-drama-script/SKILL.md","expect":["唯一分镜块","超过9镜分页","03-分镜脚本图提示词.md"]},
   {"name":"旧路径只读兼容","type":"doc-all","file":"skills/movie-create-entry/SKILL.md","expect":["只读回退","禁止自动移动或删除"]}
 ]

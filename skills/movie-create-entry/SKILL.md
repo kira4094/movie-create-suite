@@ -72,7 +72,7 @@ movie-create-drama-script          → 3A 建立 draft shots 与 shot_id
    │
    ├── movie-create-drama-dialogue → 冻结前忠实度/可表演性建议（至多一次 humanize）
    ├── movie-create-drama-emotion → 镜头 pass 按 draft shot_id 回传
-   └── script 3B 合并/冻结/渲染 → .movie-create/storyboard.json + 03-分镜提示词.md
+   └── script 3B 合并/冻结/渲染 → .movie-create/storyboard.json + 03-分镜脚本图提示词.md
        └── validate_storyboard.cjs → movie-create-drama-review → PASS
            └── PASS 后 dialogue 按最终 shots 返回 voice directives
                └── 情绪与对白内化进角色、分镜与视频
@@ -84,7 +84,7 @@ movie-create-out-video-director    → 轻量任务直接 04-视频提示词.txt
 🎯 **交付物归位四大块**（用户真正要的）：
 - **① 角色块**：01-角色提示词/{角色名}.md × N（定妆+多视图+情绪+穿戴，可粘贴生图）
 - **② 场景块**：02-场景提示词/{场景名}.md × N（含 layout 空间蓝图内化，可粘贴生图）
-- **③ 分镜块**：03-分镜提示词.md（逐镜六段式；JSON 为内部态）
+- **③ 分镜脚本图块**：03-分镜脚本图提示词.md（宫格静态渲染；JSON 为唯一事实源；旧名只读兼容）
 - **④ 视频块**：04-视频提示词.txt（每镜可直接粘贴生视频，内化情绪/台词/配音参数）
 - **输入源**：`.movie-create/source/`、`.movie-create/scan-index.md`、`.movie-create/style-guide.md`
 - **不产独立情绪或配音文件**：两者均已内化进角色、分镜与视频块
@@ -116,7 +116,7 @@ movie-create-out-video-director    → 轻量任务直接 04-视频提示词.txt
 D:\Projects\TolariaData\MovieCreate\{小说名}/
 ├── 01-角色提示词/           ← 交付物①
 ├── 02-场景提示词/           ← 交付物②
-├── 03-分镜提示词.md         ← 交付物③，drama-script 唯一写入
+├── 03-分镜脚本图提示词.md   ← 交付物③，drama-script 唯一写入
 ├── 04-视频提示词.txt        ← 交付物④，OUT 唯一写入
 └── .movie-create/            ← 原文、扫描、风格、JSON、审阅与复杂规划等内部态
 ```
@@ -154,7 +154,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 |----|-------|------|------|
 | L1 | movie-create-drama-story | .movie-create/source/story.md（内部故事源） | 短剧故事生成/从零创作 |
 | L1 | movie-create-drama-scanner | .movie-create/scan-index.md | 全本扫描/清单盘点 |
-| L1 | movie-create-drama-script | .movie-create/storyboard.json + .movie-create/screenplay.md + 03-分镜提示词.md | 分镜/剧本 + 分镜块交付物 |
+| L1 | movie-create-drama-script | .movie-create/storyboard.json + .movie-create/screenplay.md + 03-分镜脚本图提示词.md | 分镜/剧本 + 分镜脚本图块交付物 |
 | L1 | movie-create-drama-review | .movie-create/review.md（内部 PASS/FAIL） | 审阅分镜 |
 | L1 | movie-create-drama-emotion | 内存 `character_peak_expressions[]` + `shot_emotion_directives[]` | 角色/分镜/视频情绪注入 |
 | L1 | movie-create-drama-dialogue | 内存 voice directives（按 shot_id） | 冻结前建议、冻结后逐镜配音参数 |
@@ -216,7 +216,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 ### 第六步：交付（输出模板）
 
 ### 最终可见交付边界（直接模式）
-直接模式最终响应只允许四块提示词：01-角色提示词、02-场景提示词、03-分镜提示词、04-视频提示词；可附一行标题或参数。禁止向用户输出 RUN_META、Skill 调用清单、QA/校验摘要、内部路径、内部状态、计划、Gate 或评测元数据；这些内容仅保留内部态。主链暂停由 entry 统一拥有，design-style 在入口直接模式不得设置子暂停。
+直接模式最终响应只允许四块提示词：01-角色提示词、02-场景提示词、03-分镜脚本图提示词、04-视频提示词；可附一行标题或参数。禁止向用户输出 RUN_META、Skill 调用清单、QA/校验摘要、内部路径、内部状态、计划、Gate 或评测元数据；这些内容仅保留内部态。主链暂停由 entry 统一拥有，design-style 在入口直接模式不得设置子暂停。
 
 ```
 ## {小说名} · 影视化拆解完成
@@ -227,8 +227,8 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 ### 02-场景提示词
 {场景提示词正文}
 
-### 03-分镜提示词
-{分镜提示词正文}
+### 03-分镜脚本图提示词
+{分镜脚本图提示词正文}
 
 ### 04-视频提示词
 {视频提示词正文}

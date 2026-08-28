@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "skills": [
-    { "id": "movie-create-entry", "layer": "ENTRY", "purpose": "小说影视化与 AI 创作流程入口编排", "inputs": ["小说原文", "创作点子"], "outputs": ["01-角色提示词", "02-场景提示词", "03-分镜提示词.md", "04-视频提示词.txt"], "depends_on": ["skills/shared/scripts/check_skill_registry.cjs"], "planned_dependencies": [] },
+    { "id": "movie-create-entry", "layer": "ENTRY", "purpose": "小说影视化与 AI 创作流程入口编排", "inputs": ["小说原文", "创作点子"], "outputs": ["01-角色提示词", "02-场景提示词", "03-分镜脚本图提示词.md", "04-视频提示词.txt"], "depends_on": ["skills/shared/scripts/check_skill_registry.cjs"], "planned_dependencies": [] },
     { "id": "movie-create-drama-story", "layer": "L1", "purpose": "从创作点子生成内部短剧故事源", "inputs": ["创作点子", "题材与受众需求"], "outputs": [".movie-create/source/story.md"], "depends_on": [], "planned_dependencies": [] },
     { "id": "movie-create-drama-scanner", "layer": "L1", "purpose": "扫描小说并建立统一内部索引", "inputs": ["小说原文"], "outputs": [".movie-create/scan-index.md"], "depends_on": [], "planned_dependencies": [] },
-    { "id": "movie-create-drama-script", "layer": "L1", "purpose": "小说原文到结构化分镜与分镜块", "inputs": [".movie-create/scan-index.md", "章节原文"], "outputs": [".movie-create/storyboard.json", ".movie-create/screenplay.md", "03-分镜提示词.md"], "depends_on": ["skills/shared/scripts/validate_storyboard.cjs"], "planned_dependencies": [] },
+    { "id": "movie-create-drama-script", "layer": "L1", "purpose": "小说原文到结构化分镜与分镜脚本图块", "inputs": [".movie-create/scan-index.md", "章节原文"], "outputs": [".movie-create/storyboard.json", ".movie-create/screenplay.md", "03-分镜脚本图提示词.md"], "depends_on": ["skills/shared/scripts/validate_storyboard.cjs"], "planned_dependencies": [] },
     { "id": "movie-create-drama-review", "layer": "L1", "purpose": "审阅并修正分镜", "inputs": [".movie-create/storyboard.json"], "outputs": [".movie-create/review.md"], "depends_on": ["skills/shared/scripts/validate_storyboard.cjs"], "planned_dependencies": [] },
     { "id": "movie-create-drama-emotion", "layer": "L1", "purpose": "将情绪贡献内化到角色、分镜与视频", "inputs": [".movie-create/storyboard.json"], "outputs": ["内嵌情绪贡献"], "depends_on": [], "planned_dependencies": [] },
     { "id": "movie-create-drama-dialogue", "layer": "L1", "purpose": "将冻结对白与配音参数内化到视频", "inputs": [".movie-create/storyboard.json"], "outputs": ["内嵌对白与配音参数"], "depends_on": [], "planned_dependencies": [] },

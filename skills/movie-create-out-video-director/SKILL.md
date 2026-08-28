@@ -21,6 +21,8 @@ description: |
 
 ## 模型选择与专属规范
 
+**输入边界（GATE-004）**：`04-视频提示词.txt` 只从 `.movie-create/storyboard.json`、`.movie-create/style-guide.md`、冻结角色/场景资产事实及 `voice_directives` 编译；不得读取、复制或反向解析 `03-分镜脚本图提示词.md`（旧 `03-分镜提示词.md` 同样只读兼容）。原逐镜六段式的场景、构图、光影、材质、色彩语义直接从 JSON/style-guide 组装为每镜静态视觉基线，再叠加动作、运镜、表演、对白、声音和时间轴。
+
 先确认目标模型；模型未明确时询问用户。选择后只读取对应 reference：Seedance 读取 `references/seedance-output-spec.md`，MiniMax H3 读取 `references/h3-output-spec.md`。本文件不重复模型字段、标签、模板或对齐句式。
 
 ---
@@ -247,7 +249,7 @@ OUT 不把第一次判断人物、资产、空间和镜头关系的过程隐藏�
 
 ## 生产管线（分镜块 → 视频）
 
-OUT 只消费 `03-分镜提示词.md` 与 `.movie-create/storyboard.json`，将已确定的镜头编译为 `04-视频提示词.txt`。OUT 不生成分镜图、八宫格或图生图强化文件；分镜块由 drama-script 唯一负责。角色/场景素材只通过已确认的语义 `ref_anchors` 映射进入目标模型标签。
+OUT 只消费 `.movie-create/storyboard.json`、`.movie-create/style-guide.md`、冻结角色/场景资产事实与 `voice_directives`，将已确定的镜头编译为 `04-视频提示词.txt`。OUT 不读取、复制或反向解析 `03-分镜脚本图提示词.md`（旧名只读兼容）；分镜脚本图块由 drama-script 唯一负责。角色/场景素材只通过已确认的语义 `ref_anchors` 映射进入目标模型标签。
 
 ---
 

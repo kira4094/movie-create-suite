@@ -9,7 +9,7 @@
 | ENTRY | `movie-create-entry` | 编排四块交付；内部态统一放 `.movie-create/` |
 | L1 | `movie-create-drama-story` | 生成 `.movie-create/source/story.md`，服务后续四块 |
 | L1 | `movie-create-drama-scanner` | 生成 `.movie-create/scan-index.md`，服务角色/场景/分镜 |
-| L1 | `movie-create-drama-script` | 唯一生成 `.movie-create/storyboard.json` 与 `03-分镜提示词.md` |
+| L1 | `movie-create-drama-script` | 唯一生成 `.movie-create/storyboard.json` 与 `03-分镜脚本图提示词.md`（旧名只读兼容） |
 | L1 | `movie-create-drama-review` | 审阅内部 storyboard，结果写 `.movie-create/review.md` |
 | L1 | `movie-create-drama-emotion` | 内存情绪接口，注入角色峰值、分镜 mood/action/purpose 与视频反应 |
 | L1 | `movie-create-drama-dialogue` | 冻结前建议、冻结后逐镜 voice directives，注入视频块 |

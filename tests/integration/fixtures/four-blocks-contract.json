@@ -1,5 +1,5 @@
 {
-  "visible": ["01-角色提示词", "02-场景提示词", "03-分镜提示词.md", "04-视频提示词.txt"],
+  "visible": ["01-角色提示词", "02-场景提示词", "03-分镜脚本图提示词.md", "04-视频提示词.txt"],
   "internal": [".movie-create/source", ".movie-create/scan-index.md", ".movie-create/style-guide.md", ".movie-create/storyboard.json", ".movie-create/screenplay.md", ".movie-create/review.md", ".movie-create/video-plan.md"],
   "forbidden": ["独立情绪文件", "独立配音文件", "模型专用图片字段"]
 }
