@@ -49,7 +49,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\03-分镜脚本图提示词.md  
 #### 3B：finalize
 在 dialogue 冻结前建议与 emotion 镜头 pass 返回后，合并并写入最终 `dialogue`、`speaker`、`mood`、`action`、`purpose`，随后冻结并渲染 `03-分镜脚本图提示词.md`。机械校验只对 3B 冻结结果执行。
 
-**3B 冻结结果每镜必填**：shot_id / time_range / duration（2-5s）/ scene / characters / props / shot_size / camera（一镜一运镜，起点-速度-终点）/ action（肢体级）/ dialogue（入镜前最终可表演文本）+ speaker / sfx / mood / **hook**（镜头钩子类型：定调/信息揭示/情绪爆发/悬念/笑点/反转/压迫/转场）/ **ref_anchors**（参考锚点，供视频引用）/ **purpose**（镜头目的）/ **screen_direction**（轴线，多主体时）/ **continuity.start-end**（边界锁）。3A draft 可暂缺 dialogue、speaker、mood；机械校验只接受 3B 冻结结果。
+**3B 冻结结果每镜必填**：shot_id / time_range / duration（2-5s）/ scene / characters / props / shot_size / camera（一镜一运镜，起点-速度-终点）/ action（肢体级）/ dialogue（入镜前最终可表演文本）+ speaker / sfx / mood / **hook**（镜头钩子类型：定调/信息揭示/情绪爆发/悬念/笑点/反转/压迫/转场）/ **ref_anchors**（仅稳定的语义资产 ID，绝不表示图片存在）/ **purpose**（镜头目的）/ **screen_direction**（轴线，多主体时）/ **continuity.start-end**（边界锁）。3A draft 可暂缺 dialogue、speaker、mood；机械校验只接受 3B 冻结结果。
 **style 字段（扁平风格契约）**：正式分镜 JSON 的 `storyboard.meta` 必须使用 `style_source`、`style_id`、`style_name`。优先读取 `.movie-create/style-guide.md`；旧项目才回退 `00-风格定调.md`。无风格时三者均为 `null`，继续生成中性描述，不凭空编造 HEX。
 
 全片：**coverage** + **assets**（以下为机械校验消费的确切格式）：
@@ -111,7 +111,7 @@ assets: {
 从 JSON 渲染 markdown（镜号/时间/景别/场景/角色/动作/台词/情绪/运镜表 + 资产清单），不手动维护。
 
 ### 第十步：分镜脚本图提示词（唯一分镜块交付物）
-读 `.movie-create/storyboard.json` 的 `shots[]` 与 `.movie-create/style-guide.md`（如有），按镜头顺序渲染 `03-分镜脚本图提示词.md`。1镜=1×1、2镜=1×2、3–4镜=2×2、5–6镜=2×3、7–9镜=3×3，超过9镜分页，每页最多9格；每格必须映射现有 `shot_id`，不得新增剧情事实。旧 `03-分镜提示词.md` 仅只读兼容，禁止自动迁移、覆盖或删除。
+读 `.movie-create/storyboard.json` 的 `shots[]`、`.movie-create/style-guide.md`（如有）、每镜对应的 `01-角色提示词/` 与 `02-场景提示词/` 冻结身份/空间事实，以及可选 `.movie-create/reference-assets.json`，按镜头顺序渲染 `03-分镜脚本图提示词.md`。无 `verified` 图片时每镜必须是自包含 T2I，映射为空且不含平台标签；有 `verified` 真实图片时只记录模型中立的 `semantic_id/file/use` 映射，仍不得预埋 `<Picture N>`/`<图片N>`。1镜=1×1、2镜=1×2、3–4镜=2×2、5–6镜=2×3、7–9镜=3×3，超过9镜分页，每页最多9格；每格必须映射现有 `shot_id`，不得新增剧情事实。旧 `03-分镜提示词.md` 仅只读兼容，禁止自动迁移、覆盖或删除。
 
 **分镜脚本图提示词（每格一条，正文字幕用中文）**：
 
@@ -126,7 +126,7 @@ assets: {
 
 - 每镜用 `[镜N｜时间｜动作一句话]` 作标题；末段统一追加负面提示词（用 `../shared/negative-block.md` + 风格定调反向词 + 任务特有负面）。
 - 无风格或无 HEX 时不编造色值；保留中性材质与光线描述。
-- 只使用人读的 `ref_anchors` 语义映射，不写入模型专用图片字段或 `<Picture N>`、`<图片N>`；目标模型标签由 OUT 编译阶段负责。
+- 只使用人读的 `ref_anchors` 语义 ID，不写入模型专用图片字段或 `<Picture N>`、`<图片N>`；语义 ID 不是图片凭证，目标模型标签只能由 OUT 在确认真实资产并绑定本次请求后编译。
 
 ## 分镜块门控（按入口模式触发）
 03-分镜脚本图提示词.md 渲染完成后，协作审阅模式或用户明确要求先看时，停在此处等用户确认（不要直接进视频/OUT）：
@@ -154,6 +154,7 @@ assets: {
 - [ ] markdown 渲染版存在
 - [ ] 03-分镜脚本图提示词.md 存在（按 shot_id 的分页宫格 + 静态视觉语义）
 - [ ] 分镜提示词只使用语义 `ref_anchors`，未泄漏模型专用图片标签
+- [ ] 每镜已读取对应角色/场景冻结事实与可选资产账本；无 verified 图片时为自包含 T2I，有 verified 图片时仅记录 `semantic_id/file/use` 中立映射
 
 ## 反例黑名单
 

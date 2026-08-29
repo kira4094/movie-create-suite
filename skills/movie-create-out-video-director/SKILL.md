@@ -88,7 +88,7 @@ description: |
 
 ## 多模态资产公共规则
 
-语义资产只在规划阶段做人读映射；最终标签、字段、模板和对齐句式由所选 reference 解析。正文不得泄漏语义别名。角色、场景、道具、伤痕、光向和情绪状态在切镜后必须重新锚定。
+语义资产只在规划阶段做人读映射；最终标签、字段、模板和对齐句式由所选 reference 解析。正文不得泄漏语义别名。角色、场景、道具、伤痕、光向和情绪状态在切镜后必须重新锚定。`ref_anchors` 只是语义 ID，必须经过 `.movie-create/reference-assets.json` 的 `verified` 检查与本次 `.movie-create/video-config.json` 的绑定，才可生成图片标签。
 
 ### 1. 语义资产与引用（模型无关）
 
@@ -103,6 +103,7 @@ description: |
 **规则**：
 - 语义别名只存在于规划映射，不进入最终模型正文。
 - 映射必须覆盖每个实际素材，并写清资产身份、用途与连续性要求。
+- 资产账本中的 `prompt_only`、`generated`、`missing`、`ambiguous` 均不能作为已提交图片；只有 `verified` 且本次 binding 为 `bound` 才是可编译图片。Markdown/ASCII/场景蓝图永远是文字资料，不是图片资产。
 
 ### 1-3. 一致性铁律（多素材必写）
 
@@ -140,16 +141,16 @@ OUT 不把第一次判断人物、资产、空间和镜头关系的过程隐藏�
 
 规则：
 
-- 输入为分镜 JSON 时可以跳过重复的故事解析；低风险单镜可只做内部最小规划检查，复杂任务仍须显式生成规划文件。
+- 输入为分镜 JSON 时可以跳过重复的故事解析；不能跳过参考资产账本和本次 binding 的解析。低风险单镜可只做内部最小规划检查，复杂任务仍须显式生成规划文件。
 - `NEEDS-CONFIRMATION` 时同一轮不得出现任何最终提示词正文、模型字段或可直接粘贴的提示词片段。
 - 轻量 `AUTO-LOCK` 只在单镜/单主体、模型和任务明确、没有素材映射歧义、空间歧义或镜组歧义且用户没有要求先看规划时使用；只做内部最小检查后转为 `LOCKED`，不强制生成规划文件。
 - **轻量最小检查清单（必过，任一不过 → 升级为复杂路径走 NEEDS-CONFIRMATION）**：① 素材映射状态均为「已确认」（无缺失/待确认）② 风格来源可读（`style_source`/`style_id` 能定位到权威定义，或用户明确跳过）③ 无情绪歧义（`mood` 标签没有可导致不同表演结果的合理解释）④ 无镜组歧义（无需合并/拆分决策）。
 - 多主体、多素材、合并镜组、复杂空间关系或用户要求先看规划时，必须显式生成规划文件；发现歧义则为 `NEEDS-CONFIRMATION` 并停止。
 - 规划引用已有的 scene-layout、`screen_direction` 和 `continuity`，不另造互相冲突的空间事实。
-- 参考图或素材文件的语义映射存在歧义时必须停止，不能按文件顺序静默猜测。
+- 参考图或素材文件的语义映射存在歧义时必须停止，不能按文件顺序静默猜测；缺少目标模型也必须 `NEEDS-CONFIRMATION`，用户说“继续”不构成默认模型授权。
 - 复杂镜头只有在空间关系、表演控制点和镜组边界锁定后才可编译。
 - 用户修改空间、资产映射或镜组边界时，回到规划阶段并重新锁定；只重跑受影响的 OUT 产物。
-- 规划阶段的人读语义别名只用于映射声明，最终模型正文必须解析为目标模型实际标签。
+- 规划阶段的人读语义别名只用于映射声明；最终模型正文只有在真实图片已验证且本次绑定成功时才解析为目标模型实际标签，否则明确使用无图 T2V。
 
 冻结契约：`dialogue` 原样继承入镜前已完成一次必要口语化的最终台词，不翻译、不改写、不再次 humanize；风格按 `style_source → style_id → style_name` 读取。模型专属标签由对应 reference 解析，不能被门控覆盖。
 
@@ -161,7 +162,7 @@ OUT 不把第一次判断人物、资产、空间和镜头关系的过程隐藏�
 按「所选模型规范」确认目标模型 → 按「任务类型路由表」判断任务类型。**两步决定后续所有句式选择。**
 
 ### 第一步半：分镜 JSON 模式（优先输入 `.movie-create/storyboard.json`，旧项目只读回退 `03-分镜.json`）
-- 分镜 JSON 已含每镜的 `camera/action/mood/dialogue/ref_anchors` + 扁平 `meta.style_source/style_id/style_name`——**跳过素材解析**；纯环境镜（`characters=[]` 或 `mood` 为空）不展开人物情绪、生理反应、呼吸或情绪声音，只保留环境声与真实环境反馈。
+- 分镜 JSON 已含每镜的 `camera/action/mood/dialogue/ref_anchors` + 扁平 `meta.style_source/style_id/style_name`——可跳过重复剧情解析，但**不得跳过参考资产解析**；纯环境镜（`characters=[]` 或 `mood` 为空）不展开人物情绪、生理反应、呼吸或情绪声音，只保留环境声与真实环境反馈。
 - **风格字段读取顺序**：先读取 `storyboard.meta.style_source` 的完整风格定调，再用 `style_id` 精确补充单个 96 风格定义，`style_name` 仅用于展示。预设风格三者均有值；自定义风格 `style_id` 为 `null`；用户明确跳过时三者均为 `null`。选中风格但 `style_source` 或所需权威文件缺失时必须报告并停止，不得静默使用默认风格。
 - 编译时逐镜处理 `camera` + `action` + `mood`（仅人物镜展开）+ `dialogue` + `voice_directives` + `ref_anchors`；voice directive 必须与最终 shot_id/speaker/dialogue 逐项一致，否则停止退回，不自行改台词。
 - **⚠️ 情绪展开规则（仅人物表演镜）**：
@@ -170,7 +171,8 @@ OUT 不把第一次判断人物、资产、空间和镜头关系的过程隐藏�
   - **动作四层次**：人物镜按需选择至少 1 层；纯环境镜不适用。
   - 若 mood 连续相同 → 允许省略重复展开，但标记"情绪延续"
 - 输出：规划锁定后，每镜一条适配目标模型的提示词；允许合并镜头时必须先通过参考规范的镜组边界检查。
-- `ref_anchors` 中的资产 → 用目标模型的参考标签引用
+- `ref_anchors` 中的语义 ID → 先查账本和本次 binding；仅 `verified` + `bound` 的真实图片可用目标模型参考标签引用，否则无图降级，不伪造标签。
+- 参考模式路由：无 `verified + bound` 图片时使用无图 **T2V**；已验证并绑定的 `storyboard_frame` 才可使用 **I2V**；两个适用且真实绑定的起止帧，仅在目标模型明确支持时才可使用 **FL2V**。`missing`/`ambiguous` 必须进入 `NEEDS-CONFIRMATION`，或由用户明确选择无图降级，绝不伪造标签。
 - `hook` 字段提示镜头目的，帮助决定运镜强度与节奏
 - `dialogue` 是入镜前已完成一次必要口语化的最终可表演文本；逐镜直接继承，不翻译、不改写、不再次口语化。画面内可见文字仍按既有规则逐字输出。
 
@@ -249,7 +251,7 @@ OUT 不把第一次判断人物、资产、空间和镜头关系的过程隐藏�
 
 ## 生产管线（分镜块 → 视频）
 
-OUT 只消费 `.movie-create/storyboard.json`、`.movie-create/style-guide.md`、冻结角色/场景资产事实与 `voice_directives`，将已确定的镜头编译为 `04-视频提示词.txt`。OUT 不读取、复制或反向解析 `03-分镜脚本图提示词.md`（旧名只读兼容）；分镜脚本图块由 drama-script 唯一负责。角色/场景素材只通过已确认的语义 `ref_anchors` 映射进入目标模型标签。
+OUT 只消费 `.movie-create/storyboard.json`、`.movie-create/style-guide.md`、冻结角色/场景资产事实、`.movie-create/reference-assets.json`、`.movie-create/video-config.json` 与 `voice_directives`，将已确定的镜头编译为 `04-视频提示词.txt`。OUT 不读取、复制或反向解析 `03-分镜脚本图提示词.md`（旧名只读兼容）；分镜脚本图块由 drama-script 唯一负责。角色/场景素材只有在账本 `verified` 且本次 binding 为 `bound` 时才映射进入目标模型标签；无图时输出无标签 T2V。`target_model=null` 或未锁定时只输出 NEEDS-CONFIRMATION，不生成 04。
 
 ---
 
@@ -323,7 +325,7 @@ OUT 只消费 `.movie-create/storyboard.json`、`.movie-create/style-guide.md`�
 | 字数超限（>1900字） | 只压缩非台词描述、合并非关键时间段 | 冻结 `dialogue` 原样保留；仍超限则拆分生成单元并请求用户确认 |
 | 用户上传了参考图但没有文字 | 图片为主，文字最小化（仅补时长/台词要求） | 明确说明「模型会优先读取图片内容」，只补必要约束 |
 | 用户要求转多段连续剧情（>60秒） | 拆分为多条提示词，每条约15-30秒 | 提示模型单次生成时长限制，提供分镜衔接建议 |
-| 用户未指定目标模型 | 询问确认；无法确认时默认 Seedance 系并标注 | 输出后提示用户模型专属规范由对应 reference 决定 |
+| 用户未指定目标模型 | 询问确认并写入 `video-config.json`；无法确认时保持 `target_model=null`、`needs_confirmation` | 不生成 04；明确说“默认即可”才锁定 Seedance |
 | 内容违反平台规则（版权/极端内容） | 拒绝生成并说明原因 | 提供合规替代方案 |
 
 ---
@@ -372,7 +374,7 @@ OUT 只消费 `.movie-create/storyboard.json`、`.movie-create/style-guide.md`�
 请提供您的原始素材：
 - 文字：故事大纲、剧本片段、分镜草稿、分镜 JSON、小说段落、剧情提示词或口播文案
 - 参考素材（可选）：人物/场景参考图片、动作/运镜参考视频、音色参考音频
-- 目标模型（可选）：默认 Seedance；用 MiniMax H3 请说明
+- 目标模型（必须确认）：Seedance 或 MiniMax H3；明确说“默认即可”才按 `user_explicit_default` 锁定 Seedance
 提示：素材越详细（角色外貌、场景描述、情绪变化、对话内容），生成的提示词越精准；多模态任务请直接上传参考素材，我会按目标模型语法自动处理主体定义与引用。
 
 ## 最终输出格式
