@@ -124,10 +124,13 @@ invoke('validate_video_config.cjs', {schema_version:2,reference_mode:'wrong',tar
 invoke('validate_video_config.cjs', {schema_version:2,reference_mode:'automatic_platform',target_model:'seedance',selection_source:'user_explicit',output_variant:'single',state:'locked',bindings:[]}, true);
 // Manual-slot validator covers real 03/04 fixtures and storyboard-required character/scene mappings.
 const manual03 = path.join(__dirname, 'fixtures/actual-project/03-分镜脚本图提示词.md');
-const manual04 = path.join(__dirname, 'fixtures/actual-project/04-视频提示词.txt');
+const manual04 = path.join(__dirname, 'fixtures/actual-project/04-视频提示词.md');
 const actualSb = path.join(__dirname, 'fixtures/actual-project/.movie-create/storyboard.json');
 assert.strictEqual(invokeManual(manual03, actualSb).status, 0, '03 manual slots fixture must pass');
 assert.strictEqual(invokeManual(manual04).status, 0, '04 manual slots fixture must pass');
+const legacy04 = path.join(temp, 'legacy-04-视频提示词.txt');
+fs.writeFileSync(legacy04, fs.readFileSync(manual04, 'utf8'));
+assert.strictEqual(invokeManual(legacy04).status, 0, '历史 04 TXT 仅作手动槽位兼容校验必须通过');
 const wrappedSb = path.join(temp, 'wrapped-storyboard.json'); fs.writeFileSync(wrappedSb, JSON.stringify({storyboard:{shots:[{characters:['林','周'],scene:'室内'}]}}));
 assert.strictEqual(invokeManual(manual03, wrappedSb).status, 0, 'wrapped storyboard fixture must pass');
 for (const [name, body, error] of [

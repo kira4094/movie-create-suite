@@ -78,14 +78,14 @@ movie-create-drama-script          → 3A 建立 draft shots 与 shot_id
                └── 情绪与对白内化进角色、分镜与视频
    │                    （直接模式内部核验并继续）
    ▼
-movie-create-out-video-director    → 轻量任务直接 04-视频提示词.txt；复杂任务按需 .movie-create/video-plan.md → LOCKED 后 04-视频提示词.txt（【视频块交付物】，内化情绪工程+配音参数）
+movie-create-out-video-director    → 轻量任务直接 04-视频提示词.md；复杂任务按需 .movie-create/video-plan.md → LOCKED 后 04-视频提示词.md（【视频块交付物】，内化情绪工程+配音参数）
    │  → 跳转 MiniMax Hub / Seedance
 
 🎯 **交付物归位四大块**（用户真正要的）：
 - **① 角色块**：01-角色提示词/{角色名}.md × N（定妆+多视图+情绪+穿戴，可粘贴生图）
 - **② 场景块**：02-场景提示词/{场景名}.md × N（含 layout 空间蓝图内化，可粘贴生图）
 - **③ 分镜脚本图块**：03-分镜脚本图提示词.md（宫格静态渲染；JSON 为唯一事实源；旧名只读兼容）
-- **④ 视频块**：04-视频提示词.txt（每镜可直接粘贴生视频，内化情绪/台词/配音参数）
+- **④ 视频块**：04-视频提示词.md（每镜可直接粘贴生视频，内化情绪/台词/配音参数）
 - **输入源**：`.movie-create/source/`、`.movie-create/scan-index.md`、`.movie-create/style-guide.md`
 - **不产独立情绪或配音文件**：两者均已内化进角色、分镜与视频块
 
@@ -117,7 +117,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 ├── 01-角色提示词/           ← 交付物①
 ├── 02-场景提示词/           ← 交付物②
 ├── 03-分镜脚本图提示词.md   ← 交付物③，drama-script 唯一写入
-├── 04-视频提示词.txt        ← 交付物④，OUT 唯一写入
+├── 04-视频提示词.md         ← 交付物④，OUT 唯一写入
 └── .movie-create/            ← 原文、扫描、风格、JSON、审阅与复杂规划等内部态
 ```
 
@@ -162,7 +162,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 | L2 | movie-create-design-scene-layout | .movie-create/scene-layout/ | 内部场景布局/空间蓝图 |
 | L2 | movie-create-design-scene | 02-场景提示词/ | 场景块/场景提示词 |
 | L2 | movie-create-design-character | 01-角色提示词/ | 角色块/角色提示词 |
-| OUT | movie-create-out-video-director | 轻量任务：04-视频提示词.txt；复杂任务：.movie-create/video-plan.md + 04-视频提示词.txt | 分镜→编译前判断→（必要时规划）→视频提示词 |
+| OUT | movie-create-out-video-director | 轻量任务：04-视频提示词.md；复杂任务：.movie-create/video-plan.md + 04-视频提示词.md | 分镜→编译前判断→（必要时规划）→视频提示词 |
 | — | `../shared/`（共享层） | style-dna/负面块/运镜库/机械校验脚本 | 所有 skill 引用 |
 
 ## 用户输入处理指令（激活后执行，问答式向导）

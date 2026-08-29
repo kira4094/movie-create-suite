@@ -4,7 +4,7 @@ const assert = require('assert');
 const { spawnSync } = require('child_process');
 const root = path.resolve(__dirname, '../..');
 const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/four-blocks-contract.json'), 'utf8'));
-assert.deepStrictEqual(fixture.visible, ['01-角色提示词','02-场景提示词','03-分镜脚本图提示词.md','04-视频提示词.txt']);
+assert.deepStrictEqual(fixture.visible, ['01-角色提示词','02-场景提示词','03-分镜脚本图提示词.md','04-视频提示词.md']);
 const read = p => fs.readFileSync(path.join(root, p), 'utf8');
 const entry = read('skills/movie-create-entry/SKILL.md');
 const styleSkill = read('skills/movie-create-design-style/SKILL.md');
@@ -103,25 +103,25 @@ for (const scenario of adaptiveScenarios) {
     assert.strictEqual(scenario.questions.length, 1, 'missing adaptation source asks exactly one question');
     assert.deepStrictEqual(scenario.visible_outputs, [], 'missing source delivers no visible block');
   }
-  if (scenario.name === '素材映射冲突暂停') assert(!scenario.visible_outputs.includes('04-视频提示词.txt') && scenario.stop_reason.includes('受影响阶段'), 'mapping conflict pauses before 04');
+  if (scenario.name === '素材映射冲突暂停') assert(!scenario.visible_outputs.includes('04-视频提示词.md') && scenario.stop_reason.includes('受影响阶段'), 'mapping conflict pauses before 04');
   if (scenario.mode === 'collaborative') assert(scenario.pause_points && scenario.pause_points.length > 0 && scenario.stop_reason.includes('逐层确认'), `${scenario.name}: collaborative mode retains layer pauses`);
 }
 console.log('自适应模式行为 fixture测试PASS：6 个场景（静态契约，非 LLM 真实生成实测）');
 const forbiddenField = ['reference', '_image'].join('');
 assert(!script.includes(forbiddenField), 'script must not leak model-specific image fields');
-assert(out.includes('04-视频提示词.txt') && out.includes('.movie-create/storyboard.json'), 'out uses V3 paths');
+assert(out.includes('04-视频提示词.md') && out.includes('.movie-create/storyboard.json'), 'out uses V3 paths');
 assert(out.includes('dialogue') && out.includes('speaker'), 'out embeds dialogue parameters');
 assert(out.includes('默认手动槽位模式') && out.includes('自动平台适配模式'), 'OUT distinguishes manual slots from automatic platform compilation');
 assert(seedance.includes('六段式') && seedance.includes('编辑') && seedance.includes('延长') && seedance.includes('组合') && seedance.includes('Seedance QA'), 'Seedance reference is complete');
 assert(h3.includes('T2VA') && h3.includes('I2VA') && h3.includes('FL2VA') && h3.includes('L2VA') && h3.includes('Ref2VA') && h3.includes('<scenetrans>') && h3.includes('<cutoff>') && h3.includes('H3 QA'), 'H3 reference is complete');
 assert(seedance.includes('<图片N>') && seedance.includes('自动平台适配模式'), 'Seedance keeps automatic tag branch');
 assert(h3.includes('<Picture N>') && h3.includes('自动平台适配模式'), 'H3 keeps automatic tag branch');
-assert(/OUT (?:只消费|总是消费)[\s\S]*04-视频提示词\.txt/.test(out), 'OUT responsibility must resolve to the video block');
+assert(/OUT (?:只消费|总是消费)[\s\S]*04-视频提示词\.md/.test(out), 'OUT responsibility must resolve to the video block');
 assert(/分镜脚本图提示词[\s\S]*超过9镜分页/.test(script), 'script owns paged storyboard grid responsibility');
 assert(out.includes('不得读取、复制或反向解析 `03-分镜脚本图提示词.md`') && out.includes('旧 `03-分镜提示词.md` 同样只读兼容'), 'OUT explicitly excludes both storyboard prompt filenames');
 const actualRoot = path.join(__dirname, 'fixtures/actual-project');
 const actualVisible = fs.readdirSync(actualRoot).filter(name => !name.startsWith('.'));
-assert.deepStrictEqual(actualVisible.sort(), ['01-角色提示词','02-场景提示词','03-分镜脚本图提示词.md','04-视频提示词.txt'].sort(), 'actual fixture root must contain only four blocks');
+assert.deepStrictEqual(actualVisible.sort(), ['01-角色提示词','02-场景提示词','03-分镜脚本图提示词.md','04-视频提示词.md'].sort(), 'actual fixture root must contain only four blocks');
 const actualStoryboard = JSON.parse(fs.readFileSync(path.join(actualRoot, '.movie-create/storyboard.json'), 'utf8'));
 const actualVoice = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/calls/voice-directives.json'), 'utf8'));
 assert(!fs.existsSync(path.join(actualRoot, '.movie-create/voice-directives.json')), 'actual project must not contain voice directive sidecar');
@@ -139,7 +139,7 @@ assert.strictEqual(actualStoryboard.shots[1].mood, '', 'pure environment shot ha
 const forbiddenVoiceField = ['voice', '_directive'].join('');
 assert(!(forbiddenVoiceField in actualStoryboard.shots[0]) && !(forbiddenVoiceField in actualStoryboard.shots[1]), 'storyboard schema has no voice directive field');
 assert(!fs.existsSync(path.join(actualRoot, '03-分镜.json')), 'actual fixture has no legacy storyboard output');
-const actualFiles = [path.join(actualRoot, '01-角色提示词/林.md'), path.join(actualRoot, '02-场景提示词/室内.md'), path.join(actualRoot, '03-分镜脚本图提示词.md'), path.join(actualRoot, '04-视频提示词.txt')];
+const actualFiles = [path.join(actualRoot, '01-角色提示词/林.md'), path.join(actualRoot, '02-场景提示词/室内.md'), path.join(actualRoot, '03-分镜脚本图提示词.md'), path.join(actualRoot, '04-视频提示词.md')];
 const actualTexts = actualFiles.map(file => fs.readFileSync(file, 'utf8'));
 const deliverableControlTerms = /待用户|手动附加|用户上传|未附图|待办|执行档位|快速资格|模式豁免|已省略：Part|默认可(?:改|替换)|可替换|生成说明|RUN_META|AUTO-LOCK|NEEDS-CONFIRMATION|LOCKED|\.movie-create|reference-assets|video-config|style_id：|继承 .*\.movie-create|执行模式：|纯文本提示词，不生成图片|【硬性|正文：模式|场景卡只生成|来自同一证据|同一证据来源|非剧情峰值|用户选择的/;
 const internalStateToken = /(?<![A-Za-z0-9_])(?:prompt_only|verified|bound)(?![A-Za-z0-9_])/;

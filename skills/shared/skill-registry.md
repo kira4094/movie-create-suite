@@ -18,6 +18,6 @@
 | L2 | `movie-create-design-scene-layout` | 生成 `.movie-create/scene-layout/`，由场景块吸收 |
 | L2 | `movie-create-design-character` | 生成用户交付 `01-角色提示词/` |
 | L2 | `movie-create-design-scene` | 生成用户交付 `02-场景提示词/` |
-| OUT | `movie-create-out-video-director` | 消费冻结分镜/情绪/对白，生成用户交付 `04-视频提示词.txt` |
+| OUT | `movie-create-out-video-director` | 消费冻结分镜/情绪/对白，生成用户交付 `04-视频提示词.md` |
 
 入口风格路由唯一为 A/B/C/D：A=电影截图/证据提炼，仅调用 `movie-create-design-style`；B=96 预设，仅调用 `movie-create-design-preset`；C=明确跳过风格，不调用两者；D=自定义或题材推荐。D 自定义使用用户正向规则/style-dna；D 题材推荐在直接模式选可追溯的最匹配 96 预设并标记默认、协作模式推荐 1–3 项，实际落到 96 预设时才调用 `movie-create-design-preset`。入口路线 D 与解析后的来源 B（预设）/D（自定义）/C（无风格）分开记录，避免混淆。

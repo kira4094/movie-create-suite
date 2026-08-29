@@ -21,7 +21,7 @@ description: |
 
 ## 模型选择与专属规范
 
-**输入边界（GATE-004）**：`04-视频提示词.txt` 只从 `.movie-create/storyboard.json`、`.movie-create/style-guide.md`、冻结角色/场景资产事实及 `voice_directives` 编译；不得读取、复制或反向解析 `03-分镜脚本图提示词.md`（旧 `03-分镜提示词.md` 同样只读兼容）。原逐镜六段式的场景、构图、光影、材质、色彩语义直接从 JSON/style-guide 组装为每镜静态视觉基线，再叠加动作、运镜、表演、对白、声音和时间轴。
+**输入边界（GATE-004）**：`04-视频提示词.md` 只从 `.movie-create/storyboard.json`、`.movie-create/style-guide.md`、冻结角色/场景资产事实及 `voice_directives` 编译；不得读取、复制或反向解析 `03-分镜脚本图提示词.md`（旧 `03-分镜提示词.md` 同样只读兼容）。历史 `04-视频提示词.txt` 仅供查看或通用手动槽位兼容校验，禁止作为 OUT 编译输入；MD/TXT 并存时 MD 是唯一当前交付。原逐镜六段式的场景、构图、光影、材质、色彩语义直接从 JSON/style-guide 组装为每镜静态视觉基线，再叠加动作、运镜、表演、对白、声音和时间轴。
 
 先确认目标模型；模型未明确时询问用户。选择后只读取对应 reference：Seedance 读取 `references/seedance-output-spec.md`，MiniMax H3 读取 `references/h3-output-spec.md`。本文件不重复模型字段、标签、模板或对齐句式。
 
@@ -134,7 +134,7 @@ description: |
 
 ## 提示词编译前门控（轻量/复杂分流）
 
-OUT 不把第一次判断人物、资产、空间和镜头关系的过程隐藏在最终提示词中。先做编译前判断：轻量任务只做内部最小检查，复杂任务才形成显式规划；根据风险自动锁定或停下等待确认，只有状态为 `LOCKED` 才能生成 `04-视频提示词.txt`。
+OUT 不把第一次判断人物、资产、空间和镜头关系的过程隐藏在最终提示词中。先做编译前判断：轻量任务只做内部最小检查，复杂任务才形成显式规划；根据风险自动锁定或停下等待确认，只有状态为 `LOCKED` 才能生成 `04-视频提示词.md`。
 
 入口直接模式中，事实已锁定的复杂任务可在内部完成规划并 `AUTO-LOCK`→`LOCKED`；只有真实素材映射、空间关系或镜组歧义才进入 `NEEDS-CONFIRMATION`。协作审阅模式或用户明确要求先看规划时仍暂停。
 
@@ -144,12 +144,12 @@ OUT 不把第一次判断人物、资产、空间和镜头关系的过程隐藏�
 
 ```text
 读取契约与素材 → 判断轻量或复杂
-  → 轻量 AUTO-LOCK：内部最小检查 → LOCKED → 直接生成 04-视频提示词.txt
+  → 轻量 AUTO-LOCK：内部最小检查 → LOCKED → 直接生成 04-视频提示词.md
   → 复杂任务：按需生成 `.movie-create/video-plan.md`
       → AUTO-LOCK：规划摘要成立后继续
       → NEEDS-CONFIRMATION：只交规划并停止
       → 用户确认或修改后变为 LOCKED
-  → 按目标模型编译 04-视频提示词.txt
+  → 按目标模型编译 04-视频提示词.md
 ```
 
 规则：
@@ -264,7 +264,7 @@ OUT 不把第一次判断人物、资产、空间和镜头关系的过程隐藏�
 
 ## 生产管线（分镜块 → 视频）
 
-OUT 总是消费 `.movie-create/storyboard.json`、`.movie-create/style-guide.md`、冻结角色/场景资产事实、`.movie-create/video-config.json` 与 `voice_directives`，将已确定的镜头编译为 `04-视频提示词.txt`；自动平台适配模式另外消费 `.movie-create/reference-assets.json` 并联合校验本次 bindings。默认手动槽位模式只继承文首 `语义名称 = [图片槽位]` 映射，由用户实际附图，OUT 不预生成平台槽位。OUT 不读取、复制或反向解析 `03-分镜脚本图提示词.md`（旧名只读兼容）；分镜脚本图块由 drama-script 唯一负责。自动模式下角色/场景素材只有在账本 `verified` 且本次 binding 为 `bound` 时才映射进入目标模型标签；`target_model=null` 或未锁定时只输出 NEEDS-CONFIRMATION，不生成 04。
+OUT 总是消费 `.movie-create/storyboard.json`、`.movie-create/style-guide.md`、冻结角色/场景资产事实、`.movie-create/video-config.json` 与 `voice_directives`，将已确定的镜头编译为 `04-视频提示词.md`；自动平台适配模式另外消费 `.movie-create/reference-assets.json` 并联合校验本次 bindings。默认手动槽位模式只继承文首 `语义名称 = [图片槽位]` 映射，由用户实际附图，OUT 不预生成平台槽位。历史 `04-视频提示词.txt` 仅供只读查看或通用手动槽位兼容校验，禁止作为 OUT 编译输入；MD/TXT 并存时 MD 是唯一当前交付。OUT 不读取、复制或反向解析 `03-分镜脚本图提示词.md`（旧名只读兼容）；分镜脚本图块由 drama-script 唯一负责。自动模式下角色/场景素材只有在账本 `verified` 且本次 binding 为 `bound` 时才映射进入目标模型标签；`target_model=null` 或未锁定时只输出 NEEDS-CONFIRMATION，不生成 04。
 
 ---
 
@@ -348,7 +348,7 @@ OUT 总是消费 `.movie-create/storyboard.json`、`.movie-create/style-guide.md
 1. **确认理解**：简要复述素材的核心冲突、情感曲线、任务类型（文生/参考/编辑/延长）与目标模型
 2. **提取要素**：列出已提取的角色（含主体定义）、场景、时间、情绪节点
 3. **修辞替换**：列出所有被替换的文学化表达及替换方案
-4. **按状态输出**：先判断是否符合轻量 `AUTO-LOCK`；轻量任务只做内部最小检查并转为 `LOCKED`，直接输出 TXT；复杂任务先生成 `.movie-create/video-plan.md`，`AUTO-LOCK` 写精简规划摘要并转为 `LOCKED`，`NEEDS-CONFIRMATION` 只输出规划文件和最小确认问题并停止；只有 `LOCKED` 才按目标模型 + 任务类型 + 适配结构生成最终提示词
+4. **按状态输出**：先判断是否符合轻量 `AUTO-LOCK`；轻量任务只做内部最小检查并转为 `LOCKED`，直接输出 Markdown；复杂任务先生成 `.movie-create/video-plan.md`，`AUTO-LOCK` 写精简规划摘要并转为 `LOCKED`，`NEEDS-CONFIRMATION` 只输出规划文件和最小确认问题并停止；只有 `LOCKED` 才按目标模型 + 任务类型 + 适配结构生成最终提示词
 5. **内部记录**：关键设计决策（默认假设、多模态引用、模型语法选择、编辑保留项等）只留在交互或 `.movie-create/video-plan.md`，不得追加到最终 04。
 
 ---
@@ -392,7 +392,7 @@ OUT 总是消费 `.movie-create/storyboard.json`、`.movie-create/style-guide.md
 
 ## 最终输出格式
 
-- 轻量 `AUTO-LOCK`：内部完成最小检查并转为 `LOCKED`，只输出完整的 `04-视频提示词.txt`，不强制生成规划文件。
-- 复杂任务 `AUTO-LOCK`：先输出精简的 `.movie-create/video-plan.md` 摘要，条件满足后转为 `LOCKED`，再输出完整的 `04-视频提示词.txt`。
-- `NEEDS-CONFIRMATION`：只输出 `.movie-create/video-plan.md` 与最小确认问题，停止等待用户；不得输出 TXT 最终提示词、模型字段或可直接粘贴的提示词正文。
-- `LOCKED`：输出完整的 `04-视频提示词.txt`；正文按目标模型解析参考标签并继承冻结 `dialogue`。
+- 轻量 `AUTO-LOCK`：内部完成最小检查并转为 `LOCKED`，只输出完整的 `04-视频提示词.md`，不强制生成规划文件。
+- 复杂任务 `AUTO-LOCK`：先输出精简的 `.movie-create/video-plan.md` 摘要，条件满足后转为 `LOCKED`，再输出完整的 `04-视频提示词.md`。
+- `NEEDS-CONFIRMATION`：只输出 `.movie-create/video-plan.md` 与最小确认问题，停止等待用户；不得输出 Markdown 最终提示词、模型字段或可直接粘贴的提示词正文。
+- `LOCKED`：输出完整的 `04-视频提示词.md`；正文按目标模型解析参考标签并继承冻结 `dialogue`。

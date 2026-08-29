@@ -6,7 +6,7 @@
     "applicable_skills": ["movie-create-drama-story", "movie-create-drama-scanner", "movie-create-design-preset", "movie-create-drama-emotion角色pass", "movie-create-design-scene-layout", "movie-create-design-character", "movie-create-design-scene", "movie-create-drama-script 3A", "movie-create-drama-dialogue建议", "movie-create-drama-emotion镜头pass", "movie-create-drama-script 3B", "validate_storyboard", "movie-create-drama-review PASS", "movie-create-drama-dialogue voice", "movie-create-out-video-director"],
     "forbidden_skills": ["movie-create-design-style"],
     "stop_reason": null,
-    "visible_outputs": ["01-角色提示词", "02-场景提示词", "03-分镜脚本图提示词.md", "04-视频提示词.txt"],
+    "visible_outputs": ["01-角色提示词", "02-场景提示词", "03-分镜脚本图提示词.md", "04-视频提示词.md"],
     "expected": {"model": "Seedance", "aspect": "9:16", "duration_seconds": 30, "style_route": "D"}
   },
   {
@@ -16,7 +16,7 @@
     "applicable_skills": ["movie-create-drama-story", "movie-create-drama-scanner", "movie-create-design-preset", "movie-create-drama-emotion角色pass", "movie-create-design-scene-layout", "movie-create-design-character", "movie-create-design-scene", "movie-create-drama-script 3A", "movie-create-drama-dialogue建议", "movie-create-drama-emotion镜头pass", "movie-create-drama-script 3B", "validate_storyboard", "movie-create-drama-review PASS", "movie-create-drama-dialogue voice", "movie-create-out-video-director"],
     "forbidden_skills": ["movie-create-design-style"],
     "stop_reason": null,
-    "visible_outputs": ["01-角色提示词", "02-场景提示词", "03-分镜脚本图提示词.md", "04-视频提示词.txt"],
+    "visible_outputs": ["01-角色提示词", "02-场景提示词", "03-分镜脚本图提示词.md", "04-视频提示词.md"],
     "expected": {"model": "MiniMax H3", "aspect": "9:16", "duration_seconds": 45, "style_route": "D"}
   },
   {
@@ -26,7 +26,7 @@
     "applicable_skills": ["movie-create-drama-scanner", "movie-create-design-preset", "movie-create-drama-emotion角色pass", "movie-create-design-scene-layout", "movie-create-design-character", "movie-create-design-scene", "movie-create-drama-script 3A", "movie-create-drama-dialogue建议", "movie-create-drama-emotion镜头pass", "movie-create-drama-script 3B", "validate_storyboard", "movie-create-drama-review PASS", "movie-create-drama-dialogue voice", "movie-create-out-video-director"],
     "forbidden_skills": ["movie-create-drama-story", "movie-create-design-style"],
     "stop_reason": null,
-    "visible_outputs": ["01-角色提示词", "02-场景提示词", "03-分镜脚本图提示词.md", "04-视频提示词.txt"],
+    "visible_outputs": ["01-角色提示词", "02-场景提示词", "03-分镜脚本图提示词.md", "04-视频提示词.md"],
     "expected": {"model": "Seedance", "aspect": "16:9", "source_range": "第1-3章", "style_route": "B"}
   },
   {

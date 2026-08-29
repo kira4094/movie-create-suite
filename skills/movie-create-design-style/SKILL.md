@@ -15,7 +15,7 @@ description: |
 
 - `entry_style_guide`：仅由入口 A（电影截图/证据提炼）传入。执行截图核验、逐图证据记录、跨图矩阵、96 库内部查表深化，唯一内部输出为 `.movie-create/style-guide.md`。禁止样图、完整剧本资源分析、`Final_Video_Spec`、`storyboard_designer`、`element`/`key_element`、图片生成、资产注册绑定和故事板图。直接模式不设置本 Skill 的子暂停；协作模式只由 entry 在风格层统一暂停。入口 A 内部匹配 96 库不调用 `movie-create-design-preset`，保持 A/B 互斥。
 - `standalone_style_guide`：用户单点只要求风格分析或风格指南时使用。执行同等指南能力，禁止自动升级到资产、可视化剧本或 Storyboard。
-- `standalone_style_production`：仅用户单点明确要求样图、资产图、可视化剧本、Storyboard 或资产绑定时进入；只执行明确请求的子范围，不接管 entry 四块，也不写 `01-角色提示词/`、`02-场景提示词/`、`03-分镜提示词.md`、`04-视频提示词.txt`。默认内部状态隔离到 `.movie-create/style-production/`，旧位置只读兼容，不移动或删除。
+- `standalone_style_production`：仅用户单点明确要求样图、资产图、可视化剧本、Storyboard 或资产绑定时进入；只执行明确请求的子范围，不接管 entry 四块，也不写 `01-角色提示词/`、`02-场景提示词/`、`03-分镜提示词.md`、`04-视频提示词.md`。默认内部状态隔离到 `.movie-create/style-production/`，旧位置只读兼容，不移动或删除。
 
 完整管线中，character/scene 已存在 `.movie-create/style-guide.md` 时只读继承，不重复调用本 Skill；单点无指南时可重新选择 A/B/C/D，但不得隐式进入独立制片。
 
@@ -88,7 +88,7 @@ description: |
 
 `standalone_style_production` 必须先执行或加载并完成上方 Guide 基础流程（步骤 1–4 及 96 库深化），再继续以下步骤 5+。以下步骤及其依赖、交互、资产、故事板和组装说明全部仅适用于用户明确请求的 `standalone_style_production`；入口调用和 `standalone_style_guide` 在 Guide 模式出口结束，均不可达。
 
-**独立制片路径映射**：`Final_Video_Spec.md`、可视化剧本、Storyboard 中间态以及资产状态/绑定记录统一写入 `.movie-create/style-production/`；不得写入或改写入口四块的 `01-角色提示词/`、`02-场景提示词/`、`03-分镜提示词.md`、`04-视频提示词.txt`。
+**独立制片路径映射**：`Final_Video_Spec.md`、可视化剧本、Storyboard 中间态以及资产状态/绑定记录统一写入 `.movie-create/style-production/`；不得写入或改写入口四块的 `01-角色提示词/`、`02-场景提示词/`、`03-分镜提示词.md`、`04-视频提示词.md`。
 
 **子范围冻结**：进入本档位后先冻结用户明确请求的子范围（样图、角色资产、场景/道具资产、Storyboard、资产绑定），只执行已请求范围。四张样图仅在用户明确请求样图，或明确请求 Storyboard 且主动选择用样图作前置验证时生成；不得作为角色/场景资产的强制前置。仅角色资产时，Guide 后只生成角色资产，不生成样图、`Final_Video_Spec` 或 Storyboard；Storyboard 时按 Guide → 完整剧本 → 仅必要元素资产 → Storyboard，样图为可选项。
 
