@@ -1,6 +1,6 @@
 {
   "name": "movie-create-suite",
-  "version": "v0.36.2(20260829.1752)",
+  "version": "v0.36.3(20260829.1958)",
   "description": "AI 漫剧生产管线：小说或点子 → 内部扫描与风格 → 角色提示词、场景提示词、分镜脚本图提示词、视频提示词四块交付。情绪和对白直接嵌入角色/分镜/视频，内部中间态统一放在 .movie-create；旧路径只读回退，不自动移动或删除。插件公开提供 13 个技能。",
   "homepage": "https://github.com/kira4094/movie-create-suite",
   "repository": "https://github.com/kira4094/movie-create-suite",
