@@ -1,6 +1,6 @@
 # 参考资产账本合同
 
-`.movie-create/reference-assets.json` 是可选的内部资产账本，不是第五个用户交付块。它只记录真实资产的可追溯状态；`ref_anchors` 仍然只是语义 ID。
+`.movie-create/reference-assets.json` 是自动平台适配模式可选的内部资产账本，不是第五个用户交付块。默认手动槽位模式不消费本账本；文档中的 `语义名称 = [图片槽位]` 由用户手动附图，不能据此声称真实资产已存在。`ref_anchors` 仍然只是语义 ID。
 
 ```json
 {

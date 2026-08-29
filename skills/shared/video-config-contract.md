@@ -1,6 +1,20 @@
 # 视频配置与本次绑定合同
 
-`.movie-create/video-config.json` 是内部状态文件，不是用户交付物。它记录本次视频编译的模型选择和请求级资产绑定。
+`.movie-create/video-config.json` 是内部状态文件，不是用户交付物。两种模式都需要它记录本次视频编译的模型选择；默认手动槽位模式使用 `bindings=[]`，不把手动槽位声称为已验证真实资产。自动平台适配模式才记录请求级资产绑定并联合账本校验。
+
+```json
+{
+  "schema_version": 2,
+  "reference_mode": "manual_slots",
+  "target_model": "seedance|h3|null",
+  "selection_source": "user_explicit|user_explicit_default|null",
+  "output_variant": "single|dual",
+  "state": "locked|needs_confirmation",
+  "bindings": []
+}
+```
+
+新项目默认使用 `schema_version:2` + `reference_mode:"manual_slots"` + `bindings:[]`。以下 schema 1 仅作为旧版 `automatic_platform` 兼容输入，不是新项目示例：
 
 ```json
 {
@@ -21,7 +35,7 @@
 }
 ```
 
-“继续”不等于模型授权。`target_model=null` 或任一必需绑定未解决时必须保持 `needs_confirmation`，不生成 04。明确说“默认即可”才可使用 `user_explicit_default` 锁定 Seedance。生成 04 前必须将本文件作为第一参数、`reference-assets.json` 作为第二参数执行联合校验。
+“继续”不等于模型授权。`target_model=null` 或任一必需绑定未解决时必须保持 `needs_confirmation`，不生成 04。明确说“默认即可”才可使用 `user_explicit_default` 锁定 Seedance。自动平台适配模式生成 04 前必须将本文件作为第一参数、`reference-assets.json` 作为第二参数执行联合校验；手动槽位模式只需校验本文件与文首映射。
 
 `locked` 必须有目标模型、选择来源，且不得含 `missing`/`ambiguous`。每个 `bound` 必须有 source、非空模型标签、唯一正整数 `upload_order`；Seedance 只能使用与序号一致的 `<图片N>`，H3 只能使用 `<Picture N>`，禁止混用。`needs_confirmation` 可以已经选定模型，但仍有未解决绑定。
 

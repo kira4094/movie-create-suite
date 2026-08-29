@@ -10,12 +10,16 @@ let ledger = null;
 if (ledgerFile) { try { ledger = JSON.parse(fs.readFileSync(ledgerFile, 'utf8')); } catch (e) { console.error(`资产账本无法读取: ${e.message}`); process.exit(1); } }
 if (ledger && (typeof ledger !== 'object' || Array.isArray(ledger))) { console.error('资产账本 FAIL：顶层必须为非 null 普通对象'); process.exit(1); }
 const errors = [];
-if (doc.schema_version !== 1) errors.push('schema_version 必须为 1');
+if (![1,2].includes(doc.schema_version)) errors.push('schema_version 必须为 1 或 2');
+const referenceMode = doc.schema_version === 1 ? 'automatic_platform' : doc.reference_mode;
+if (doc.schema_version === 2 && !['manual_slots','automatic_platform'].includes(referenceMode)) errors.push('reference_mode 必须为 manual_slots 或 automatic_platform');
 if (!['seedance','h3',null].includes(doc.target_model)) errors.push('target_model 非法');
 if (!['user_explicit','user_explicit_default',null].includes(doc.selection_source)) errors.push('selection_source 非法');
 if (!['single','dual'].includes(doc.output_variant)) errors.push('output_variant 非法');
 if (!['locked','needs_confirmation'].includes(doc.state)) errors.push('state 非法');
 if (!Array.isArray(doc.bindings)) errors.push('bindings 必须为数组');
+if (referenceMode === 'manual_slots' && ledgerFile) errors.push('manual_slots 不得提供 reference-assets.json');
+if (referenceMode === 'manual_slots' && Array.isArray(doc.bindings) && doc.bindings.length) errors.push('manual_slots 的 bindings 必须为空数组');
 for (const [i, b] of (doc.bindings || []).entries()) {
   if (!b || typeof b !== 'object' || Array.isArray(b)) { errors.push(`bindings[${i}] 必须为非 null 对象`); continue; }
   for (const k of ['semantic_id','use','status']) if (typeof b[k] !== 'string' || !b[k].trim()) errors.push(`bindings[${i}].${k} 必须为非空字符串`);
@@ -40,8 +44,8 @@ for (const b of bound) {
   if (doc.target_model === 'seedance' && /<Picture\s*\d+>/.test(b.platform_tag)) errors.push('Seedance 禁止 H3 标签');
   if (doc.target_model === 'h3' && /<图片\s*\d+>/.test(b.platform_tag)) errors.push('H3 禁止 Seedance 标签');
 }
-if (bound.length && !ledger) errors.push('存在 bound binding 时必须提供 reference-assets.json 进行联合校验');
-if (bound.length && ledger) {
+if (referenceMode === 'automatic_platform' && bound.length && !ledger) errors.push('存在 bound binding 时必须提供 reference-assets.json 进行联合校验');
+if (referenceMode === 'automatic_platform' && bound.length && ledger) {
   const assets = Array.isArray(ledger.assets) ? ledger.assets : [];
   for (const b of bound) {
     const a = assets.find(x => x && x.semantic_id === b.semantic_id);

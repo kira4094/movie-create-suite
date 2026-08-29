@@ -111,12 +111,12 @@ const forbiddenField = ['reference', '_image'].join('');
 assert(!script.includes(forbiddenField), 'script must not leak model-specific image fields');
 assert(out.includes('04-视频提示词.txt') && out.includes('.movie-create/storyboard.json'), 'out uses V3 paths');
 assert(out.includes('dialogue') && out.includes('speaker'), 'out embeds dialogue parameters');
-for (const token of ['<Picture N>', '<图片N>', '<视频N>', '<音频N>', '严格编辑<视频N>', '延长<视频N>', 'integrated_multimodal_description', 'subject_definitions', '<scenetrans>', '<cutoff>']) {
-  assert(!out.includes(token), `OUT 主文件不得包含模型专属 token: ${token}`);
-}
+assert(out.includes('默认手动槽位模式') && out.includes('自动平台适配模式'), 'OUT distinguishes manual slots from automatic platform compilation');
 assert(seedance.includes('六段式') && seedance.includes('编辑') && seedance.includes('延长') && seedance.includes('组合') && seedance.includes('Seedance QA'), 'Seedance reference is complete');
 assert(h3.includes('T2VA') && h3.includes('I2VA') && h3.includes('FL2VA') && h3.includes('L2VA') && h3.includes('Ref2VA') && h3.includes('<scenetrans>') && h3.includes('<cutoff>') && h3.includes('H3 QA'), 'H3 reference is complete');
-assert(/OUT 只消费[\s\S]*04-视频提示词\.txt/.test(out), 'OUT responsibility must resolve to the video block');
+assert(seedance.includes('<图片N>') && seedance.includes('自动平台适配模式'), 'Seedance keeps automatic tag branch');
+assert(h3.includes('<Picture N>') && h3.includes('自动平台适配模式'), 'H3 keeps automatic tag branch');
+assert(/OUT (?:只消费|总是消费)[\s\S]*04-视频提示词\.txt/.test(out), 'OUT responsibility must resolve to the video block');
 assert(/分镜脚本图提示词[\s\S]*超过9镜分页/.test(script), 'script owns paged storyboard grid responsibility');
 assert(out.includes('不得读取、复制或反向解析 `03-分镜脚本图提示词.md`') && out.includes('旧 `03-分镜提示词.md` 同样只读兼容'), 'OUT explicitly excludes both storyboard prompt filenames');
 const actualRoot = path.join(__dirname, 'fixtures/actual-project');
@@ -141,8 +141,12 @@ assert(!(forbiddenVoiceField in actualStoryboard.shots[0]) && !(forbiddenVoiceFi
 assert(!fs.existsSync(path.join(actualRoot, '03-分镜.json')), 'actual fixture has no legacy storyboard output');
 const actualFiles = [path.join(actualRoot, '01-角色提示词/林.md'), path.join(actualRoot, '02-场景提示词/室内.md'), path.join(actualRoot, '03-分镜脚本图提示词.md'), path.join(actualRoot, '04-视频提示词.txt')];
 const actualTexts = actualFiles.map(file => fs.readFileSync(file, 'utf8'));
-assert(actualTexts[3].includes('<Picture 1>'), 'only video block contains model reference tag');
-assert(actualTexts.slice(0, 3).every(text => !text.includes('<Picture 1>')), 'non-video blocks stay model neutral');
+for (const text of actualTexts.slice(2)) {
+  assert(!/prompt_only|verified|bound|reference-assets\.json|video-config\.json|<Picture\s*\d+>|<图片\s*\d+>/.test(text), 'default 03/04 fixtures stay manual-slot and model-neutral');
+}
+for (const text of actualTexts.slice(2, 4)) assert((text.match(/## 参考资产映射/g) || []).length === 1, '03/04 have one mapping heading');
+assert(actualTexts[2].includes('林 = [林设定图]') && actualTexts[2].includes('室内 = [室内场景图]'), '03 mapping covers character and scene');
+assert(actualTexts[3].includes('林 = [林设定图]') && actualTexts[3].includes('客厅 = [客厅场景图]'), '04 mapping uses manual slots');
 const visibleReaction = '目光锁定门把手、指节收紧、呼吸短促';
 assert(actualTexts[0].includes('六格') && actualTexts[0].includes('起势、峰值、余波'), 'character fixture has six evidence frames');
 assert(actualStoryboard.shots[0].mood === '恐惧·中度' && actualStoryboard.shots[0].action.includes('抓住门把手'), 'storyboard carries frozen mood/action');

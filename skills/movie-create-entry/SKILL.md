@@ -121,7 +121,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 └── .movie-create/            ← 原文、扫描、风格、JSON、审阅与复杂规划等内部态
 ```
 
-> 新项目只交付上述四块；`.movie-create/` 不增加用户交付物。内部包括 `source/`、`scan-index.md`、`style-guide.md`、`storyboard.json`、`screenplay.md`、`review.md`，以及可选的 `reference-assets.json`（真实图片账本）和 `video-config.json`（本次模型/绑定状态），复杂 OUT 按需增加 `video-plan.md`。审阅结果写入 `.movie-create/review.md`。情绪和对白直接嵌入角色、分镜与视频。旧项目路径仅只读回退，禁止自动移动或删除。
+> 新项目只交付上述四块；`.movie-create/` 不增加用户交付物。03 与 04 默认采用文档开头一次性的 `语义名称 = [图片槽位]` 手动参考图映射，后文只写语义名称。两种模式都使用 `video-config.json` 记录目标模型；手动模式保持 `bindings=[]`，只有自动平台适配模式才启用 `reference-assets.json` 及非空 bindings。内部还包括 `source/`、`scan-index.md`、`style-guide.md`、`storyboard.json`、`screenplay.md`、`review.md`，复杂 OUT 按需增加 `video-plan.md`。审阅结果写入 `.movie-create/review.md`。情绪和对白直接嵌入角色、分镜与视频。旧项目路径仅只读回退，禁止自动移动或删除。
 
 > 若用户指定子目录（如 Realtest/），项目建在 `{根}/{子目录}/{小说名}/`。
 
@@ -144,7 +144,7 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
    - 用户回 [3] → 记录修改 → 重跑受影响层（不空烧下游）
    - 用户未明确继续 → 协作审阅模式停在层边界；直接模式内部核验并继续
    门控位置：① 入口定调后 → 美术层前；② 美术层产出后 → 文字层前（含 HEX 拍板）；③ 文字层产出后 → 出口前。直接模式不因这些边界暂停。
-   OUT 内部的 `AUTO-LOCK / NEEDS-CONFIRMATION / LOCKED` 属于 out-video-director 的编译流程，不新增入口的第四道全局门控。入口负责恢复并持久化 `.movie-create/video-config.json` 的模型选择、`.movie-create/reference-assets.json` 账本与本次 bindings；进入 OUT 前运行 `validate_reference_assets.cjs`，再将 `video-config.json` 与 `reference-assets.json` 作为两个参数运行 `validate_video_config.cjs` 联合校验。若模型未锁定或绑定命中 `NEEDS-CONFIRMATION`，只暂停 OUT、不生成 04；用户确认后继续，不重跑无关上游层。
+   OUT 内部的 `AUTO-LOCK / NEEDS-CONFIRMATION / LOCKED` 属于 out-video-director 的编译流程，不新增入口的第四道全局门控。两种模式都恢复并持久化 `.movie-create/video-config.json` 的模型选择；手动模式同时恢复文首 `语义名称 = [图片槽位]` 映射，保持 `bindings=[]`，以单参数校验 config；自动平台适配模式另加 `.movie-create/reference-assets.json` 账本与非空 bindings，并执行联合校验。若模型未锁定或自动绑定命中 `NEEDS-CONFIRMATION`，只暂停 OUT、不生成 04；用户确认后继续，不重跑无关上游层。
 3. **单点调用**：用户只要某类资产 → 直接引导到对应独立 skill，不强制走全流程
 4. **范围标注**：README 记录输入范围（全本/章节），一致性仅限该范围
 

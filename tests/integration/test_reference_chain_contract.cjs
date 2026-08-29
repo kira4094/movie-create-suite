@@ -11,11 +11,13 @@ const out = read('skills/movie-create-out-video-director/SKILL.md');
 const plan = read('skills/movie-create-out-video-director/references/pre-prompt-planning.md');
 const entry = read('skills/movie-create-entry/SKILL.md');
 for (const text of [script, spec]) assert(!/ref_anchors[^\n]*供视频生成的 `<Picture N>`/.test(text), 'semantic anchors must not promise model tags');
-assert(script.includes('语义 ID 不是图片凭证'), '03 declares semantic-only anchors');
-assert(out.includes('不得跳过参考资产解析') && out.includes('verified') && out.includes('bound'), '04 resolves ledger and request binding');
+assert(script.includes('文档级一次性手动参考图槽位') && script.includes('角色名 = [角色名设定图]'), '03 declares document-level manual slots');
+assert(script.includes('不展示 `reference-assets.json`') && script.includes('不生成 `<Picture N>`/`<图片N>`'), '03 hides internal asset state in manual mode');
+assert(out.includes('自动平台适配模式') && out.includes('verified') && out.includes('bound'), '04 resolves ledger and request binding only in automatic mode');
 assert(out.includes('target_model=null') && out.includes('不生成 04'), 'missing model blocks 04');
 assert(plan.includes('用户只说“继续”') && plan.includes('无真实绑定图片时必须使用无图 T2V'), 'confirmation and no-image fallback are explicit');
 assert(entry.includes('reference-assets.json') && entry.includes('video-config.json'), 'entry hands off internal state');
+assert(entry.includes('两种模式都使用 `video-config.json`') && entry.includes('手动模式保持 `bindings=[]`') && entry.includes('只有自动平台适配模式才启用 `reference-assets.json`'), 'entry keeps config in both modes and ledger only for automatic bindings');
 assert(!/ref_anchors[^\n]*(?:→|映射为)[^\n]*(?:<Picture N>|<图片N>)/.test(script), '03 must not compile anchors into model tags');
 const run = (name, arg) => { const r = spawnSync(process.execPath, [path.join(root, 'skills/shared/scripts', name), path.join(__dirname, 'fixtures', arg)], { encoding:'utf8' }); assert.strictEqual(r.status, 0, `${name} failed:\n${r.stdout}\n${r.stderr}`); };
 run('validate_reference_assets.cjs', 'reference-assets-valid.json');
@@ -35,10 +37,16 @@ const invokeAt = (scriptName, value, file) => {
   const r = spawnSync(process.execPath, [path.join(root, 'skills/shared/scripts', scriptName), file], {encoding:'utf8'});
   return r;
 };
+const invokeManual = (file, storyboardFile = null) => {
+  const args = [path.join(root, 'skills/shared/scripts/validate_manual_reference_slots.cjs'), file];
+  if (storyboardFile) args.push(storyboardFile);
+  return spawnSync(process.execPath, args, {encoding:'utf8'});
+};
 // A: confirmed model with no images is valid T2V and carries no bindings/tags.
 invoke('validate_video_config.cjs', {schema_version:1,target_model:'seedance',selection_source:'user_explicit',output_variant:'single',state:'locked',bindings:[]}, true);
 // B: semantic anchors remain names, never model tags.
-assert(script.includes('语义 ID 不是图片凭证') && !/ref_anchors[^\n]*(?:→|映射为)[^\n]*(?:<Picture N>|<图片N>)/.test(script), '语义 anchors 不等于模型标签');
+assert(script.includes('方括号不得填入') && !/ref_anchors[^\n]*(?:→|映射为)[^\n]*(?:<Picture N>|<图片N>)/.test(script), 'manual slots are not model tags');
+assert(out.includes('默认手动槽位模式') && plan.includes('语义名称 = [图片槽位]'), '04 supports one-time manual mapping');
 // C/D: verified character/scene and storyboard frame can be bound through neutral IDs.
 const verified = {schema_version:1,assets:[
   {semantic_id:'角色A',kind:'character_identity',source_prompt:'角色卡',file:null,platform_asset_id:'asset-character-a',availability_status:'verified',uses:['identity'],shot_ids:['S01-01']},
@@ -107,4 +115,49 @@ assert(/必须为非 null 对象/.test(`${malformedBindings.stdout}\n${malformed
 // H: “继续” does not authorize a default model; unresolved model fixture passes as needs_confirmation.
 assert(plan.includes('用户只说“继续”') && plan.includes('target_model=null'), '继续不授权默认模型');
 run('validate_video_config.cjs', 'video-config-needs-confirmation.json');
+// v2 mode separation: manual accepts only empty bindings; automatic keeps legacy rules.
+invoke('validate_video_config.cjs', {schema_version:2,reference_mode:'manual_slots',target_model:'seedance',selection_source:'user_explicit',output_variant:'single',state:'locked',bindings:[]}, true);
+invoke('validate_video_config.cjs', {schema_version:2,reference_mode:'manual_slots',target_model:'seedance',selection_source:'user_explicit',output_variant:'single',state:'locked',bindings:[{semantic_id:'角色A',use:'identity',status:'bound',source:'x',platform_tag:'<图片1>',upload_order:1}]}, false, null, 'manual_slots 的 bindings 必须为空数组');
+invoke('validate_video_config.cjs', {schema_version:2,reference_mode:'manual_slots',target_model:'seedance',selection_source:'user_explicit',output_variant:'single',state:'locked',bindings:[]}, false, {schema_version:1,assets:[]}, 'manual_slots 不得提供 reference-assets.json');
+invoke('validate_video_config.cjs', {schema_version:2,target_model:'seedance',selection_source:'user_explicit',output_variant:'single',state:'locked',bindings:[]}, false, null, 'reference_mode 必须为 manual_slots 或 automatic_platform');
+invoke('validate_video_config.cjs', {schema_version:2,reference_mode:'wrong',target_model:'seedance',selection_source:'user_explicit',output_variant:'single',state:'locked',bindings:[]}, false, null, 'reference_mode 必须为 manual_slots 或 automatic_platform');
+invoke('validate_video_config.cjs', {schema_version:2,reference_mode:'automatic_platform',target_model:'seedance',selection_source:'user_explicit',output_variant:'single',state:'locked',bindings:[]}, true);
+// Manual-slot validator covers real 03/04 fixtures and storyboard-required character/scene mappings.
+const manual03 = path.join(__dirname, 'fixtures/actual-project/03-分镜脚本图提示词.md');
+const manual04 = path.join(__dirname, 'fixtures/actual-project/04-视频提示词.txt');
+const actualSb = path.join(__dirname, 'fixtures/actual-project/.movie-create/storyboard.json');
+assert.strictEqual(invokeManual(manual03, actualSb).status, 0, '03 manual slots fixture must pass');
+assert.strictEqual(invokeManual(manual04).status, 0, '04 manual slots fixture must pass');
+const wrappedSb = path.join(temp, 'wrapped-storyboard.json'); fs.writeFileSync(wrappedSb, JSON.stringify({storyboard:{shots:[{characters:['林'],scene:'室内'}]}}));
+assert.strictEqual(invokeManual(manual03, wrappedSb).status, 0, 'wrapped storyboard fixture must pass');
+for (const [name, body, error] of [
+  ['duplicate-name', '## 参考资产映射\n- 林 = [林设定图]\n- 林 = [林设定图]\n', '语义名称重复'],
+  ['duplicate-slot', '## 参考资产映射\n- 林 = [同一图]\n- 周 = [同一图]\n', '图片槽位重复'],
+  ['bad-slot', '## 参考资产映射\n- 林 = [蓝图.md]\n', '槽位不得包含'],
+  ['repeat-slot', '## 参考资产映射\n- 林 = [林设定图]\n正文再次 [林设定图]\n', '图片槽位必须只在映射块出现一次']
+]) {
+  const f = path.join(temp, `${name}.md`); fs.writeFileSync(f, body);
+  const result = invokeManual(f); assert.notStrictEqual(result.status, 0, `${name} must fail`); assert(`${result.stdout}\n${result.stderr}`.includes(error), `${name} error`);
+}
+const missing = path.join(temp, 'missing-scene.md'); fs.writeFileSync(missing, '## 参考资产映射\n- 林 = [林设定图]\n');
+const sceneSb = path.join(temp, 'scene-storyboard.json'); fs.writeFileSync(sceneSb, JSON.stringify({shots:[{characters:['林'],scene:'室内'}]}));
+const missingResult = invokeManual(missing, sceneSb); assert.notStrictEqual(missingResult.status, 0, 'missing scene mapping must fail'); assert(`${missingResult.stdout}\n${missingResult.stderr}`.includes('缺少场景映射'), 'missing scene error');
+const wrappedMissing = path.join(temp, 'wrapped-missing-role.json'); fs.writeFileSync(wrappedMissing, JSON.stringify({storyboard:{shots:[{characters:['王'],scene:'室内'}]}}));
+const wrappedMissingResult = invokeManual(manual03, wrappedMissing); assert.notStrictEqual(wrappedMissingResult.status, 0, 'wrapped missing role must fail'); assert(`${wrappedMissingResult.stdout}\n${wrappedMissingResult.stderr}`.includes('缺少角色映射'), 'wrapped missing role error');
+const outside = path.join(temp, 'outside-mapping.md'); fs.writeFileSync(outside, '## 参考资产映射\n- 林 = [林设定图]\n## 正文\n- 周 = [周设定图]\n');
+assert.strictEqual(invokeManual(outside).status, 0, 'mapping outside block is ignored');
+const malformed = path.join(temp, 'malformed-bullet.md'); fs.writeFileSync(malformed, '## 参考资产映射\n- 林：[林设定图]\n');
+const malformedResult = invokeManual(malformed); assert.notStrictEqual(malformedResult.status, 0, 'malformed mapping bullet must fail'); assert(`${malformedResult.stdout}\n${malformedResult.stderr}`.includes('格式非法'), 'malformed bullet error');
+const leaked = path.join(temp, 'leaked-state.md'); fs.writeFileSync(leaked, '## 参考资产映射\n- 林 = [林设定图]\n正文 prompt_only <Picture 1>\n');
+const leakedResult = invokeManual(leaked); assert.notStrictEqual(leakedResult.status, 0, 'manual state/tag leakage must fail'); assert(`${leakedResult.stdout}\n${leakedResult.stderr}`.includes('不得泄漏内部状态'), 'manual leakage error');
+const boundary = path.join(temp, 'boundary.md'); fs.writeFileSync(boundary, '## 参考资产映射\n- 林 = [林设定图]\n正文 boundary 条件通过。\n');
+assert.strictEqual(invokeManual(boundary).status, 0, 'boundary must not match bound state token');
+const standaloneBound = path.join(temp, 'standalone-bound.md'); fs.writeFileSync(standaloneBound, '## 参考资产映射\n- 林 = [林设定图]\n正文 bound 状态泄漏。\n');
+const standaloneBoundResult = invokeManual(standaloneBound); assert.notStrictEqual(standaloneBoundResult.status, 0, 'standalone bound must fail');
+for (const badSlot of ['设定.md','空间蓝图','scene-layout','ASCII图','提示词']) {
+  const f = path.join(temp, `bad-slot-${badSlot}.md`); fs.writeFileSync(f, `## 参考资产映射\n- 林 = [${badSlot}]\n`);
+  assert.notStrictEqual(invokeManual(f).status, 0, `forbidden slot must fail: ${badSlot}`);
+}
+const autoBoundNoLedger = {schema_version:2,reference_mode:'automatic_platform',target_model:'h3',selection_source:'user_explicit',output_variant:'single',state:'locked',bindings:[{semantic_id:'x',use:'identity',source:'x',platform_tag:'<Picture 1>',upload_order:1,status:'bound'}]};
+invoke('validate_video_config.cjs', autoBoundNoLedger, false, null, '必须提供 reference-assets.json');
 console.log('参考图链路合同测试 PASS：Gate A-H 实际正反例矩阵');
