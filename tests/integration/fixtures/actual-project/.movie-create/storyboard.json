@@ -1,7 +1,7 @@
 {
   "meta": {"style_source":".movie-create/style-guide.md","style_id":"3d-test","style_name":"用户选择风格"},
   "shots": [
-    {"shot_id":"S01-01","characters":["林","周"],"mood":"恐惧·中度","action":"林抓住门把手，周停住脚步并侧耳倾听","purpose":"阻止离开","speaker":"林","dialogue":"别走","ref_anchors":["林","周"]},
-    {"shot_id":"S01-02","characters":[],"mood":"","action":"门轴回弹","purpose":"环境反馈","speaker":"","dialogue":""}
+    {"shot_id":"S01-01","characters":["林","周"],"scene":"室内","mood":"恐惧·中度","action":"林抓住门把手，周停住脚步并侧耳倾听","purpose":"阻止离开","speaker":"林","dialogue":"别走","ref_anchors":["林","周"]},
+    {"shot_id":"S01-02","characters":[],"scene":"室内","mood":"","action":"门轴回弹","purpose":"环境反馈","speaker":"","dialogue":""}
   ]
 }

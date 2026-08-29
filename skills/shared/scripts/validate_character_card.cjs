@@ -2,29 +2,17 @@
 // validate_character_card.cjs — 角色卡 v3 精确契约校验
 const fs = require('fs');
 const file = process.argv[2];
-if (!file) { console.error('用法: node validate_character_card.cjs <角色卡.md>'); process.exit(2); }
+const expectedArg = process.argv[3] || '1,2,3,4';
+const expected = expectedArg.split(/[,，→\s]+/).filter(Boolean).map(Number);
+if (!file) { console.error('用法: node validate_character_card.cjs <角色卡.md> [expected-parts]'); process.exit(2); }
+if (!expected.length || expected.some(n => ![1,2,3,4].includes(n)) || new Set(expected).size !== expected.length) {
+  console.error('FAIL expected-parts：必须是 1,2,3,4 的不重复序列'); process.exit(2);
+}
 let s; try { s = fs.readFileSync(file, 'utf8'); } catch (e) { console.error('无法读取:', e.message); process.exit(1); }
 const issues = [];
-const quickRequested = /执行档位：快速(?:（用户已确认）)?/.test(s), quick = /执行档位：快速（用户已确认）/.test(s);
-if (quickRequested && !quick) issues.push('FAIL 快速档位：缺少用户明确确认');
-if (!/执行档位：(?:快速(?:（用户已确认）)?|标准|制作)/.test(s)) issues.push('FAIL 执行档位：缺少标准/制作/快速标记');
-if (quickRequested && !/模式豁免：Part2、Part4/.test(s)) issues.push('FAIL 快速档位：缺少精确模式豁免标记');
-const q = s.match(/^快速资格：(.+)$/m);
-if (quickRequested && !q) issues.push('FAIL 快速档位：缺少快速资格明细');
-if (quickRequested && q) {
-  const v = q[1], num = (label, max) => { const m = v.match(new RegExp(`${label}=(\\d+)秒?`)); if (!m || +m[1] > max) issues.push(`FAIL 快速资格：${label}超限或缺失`); };
-  num('时长',30); num('主角',2); num('场景',2);
-  if (!/(?:模型)=(?:Seedance|MiniMax H3)(?:；|$)/.test(v)) issues.push('FAIL 快速资格：模型未明确');
-  if (!/(?:比例)=(?:4:3|9:16|16:9)(?:；|$)/.test(v)) issues.push('FAIL 快速资格：比例未明确');
-  for (const x of ['素材绑定歧义','镜组歧义','忠实度未决','人性化未决','角色归属未决']) if (!new RegExp(`${x}=无(?:；|$)`).test(v)) issues.push(`FAIL 快速资格：${x}必须为无`);
-}
+if (/执行档位：|快速资格：|模式豁免：|已省略：Part\s*[234]/.test(s)) issues.push('FAIL 角色卡：不得包含执行档位、资格、豁免或省略控制字段');
 const ms = [...s.matchAll(/^##\s+Part\s+([1-4])[^\n]*(?:\r?\n|$)/gmi)];
 const parts = new Map(ms.map((m, i) => [+m[1], s.slice(m.index + m[0].length, i + 1 < ms.length ? ms[i + 1].index : s.length)]));
-const omitted = new Set([...s.matchAll(/已省略：Part\s*([234])（用户明确豁免）/g)].map(m => +m[1]));
-if (/已省略：Part\s*1（用户明确豁免）/.test(s)) issues.push('FAIL Part1：不可豁免');
-if (quick && omitted.size) issues.push('FAIL 快速档位：不得使用逐项已省略标记，仅使用模式豁免：Part2、Part4');
-if (quick && omitted.has(3)) issues.push('FAIL 快速档位：Part3不可省略');
-const expected = quick ? [1,3] : [1,2,3,4].filter(n => !omitted.has(n));
 if (ms.map(m => +m[1]).join(',') !== expected.join(',')) issues.push(`FAIL Part 顺序或数量：应为 ${expected.join('→')}`);
 const schemas = {
   1: ['参考图映射','一致性铁律','图片对齐','生成规格','技能0·角色人设','技能1·画幅与题材锚定','技能2·景别与机位·身份体型姿态','技能3·背景','技能4·长相与气质','技能5·发型','技能6·服装槽位','技能7·面料质感','技能8·姿态与状态','技能9·布光与质感','技能10·反向词','限制'],
@@ -45,6 +33,7 @@ function strictPart(n, body) {
   if (n > 1 && !/Part\s*1|Picture 1|角色1/.test(body)) issues.push(`FAIL Part${n}：必须引用 Part1 唯一事实源`);
   if (n === 2 && (!/左侧45°|左侧45度/.test(body) || !/右侧90°|右侧90度|右侧面/.test(body) || !/下区裁切/.test(body))) issues.push('FAIL Part2：视角/下区裁切受控派生要求缺失');
   if (n === 3 && !/2行×3列六格|2行x3列六格|六格/.test(body)) issues.push('FAIL Part3：缺少六格峰值表情布局');
+  if (n === 3 && /(?:｜|\|)证据[“\"]|有证据的表情/.test(body)) issues.push('FAIL Part3：不得暴露证据来源或内部选择机制');
   if (n === 4) {
     const list = body.match(/^穿戴物清单：共(\d+)件；(.+)$/m), layout = body.match(/^宫格布局：(.+)$/m), layoutText = layout?.[0] || '';
     if (!list || !layout) issues.push('FAIL Part4：宫格/分页规则缺失');

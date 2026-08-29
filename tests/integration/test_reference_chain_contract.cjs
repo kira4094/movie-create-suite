@@ -15,7 +15,7 @@ assert(script.includes('文档级一次性手动参考图槽位') && script.incl
 assert(script.includes('不展示 `reference-assets.json`') && script.includes('不生成 `<Picture N>`/`<图片N>`'), '03 hides internal asset state in manual mode');
 assert(out.includes('自动平台适配模式') && out.includes('verified') && out.includes('bound'), '04 resolves ledger and request binding only in automatic mode');
 assert(out.includes('target_model=null') && out.includes('不生成 04'), 'missing model blocks 04');
-assert(plan.includes('用户只说“继续”') && plan.includes('无真实绑定图片时必须使用无图 T2V'), 'confirmation and no-image fallback are explicit');
+assert(plan.includes('用户只说“继续”') && plan.includes('自动模式无真实绑定图片时使用无图 T2V'), 'confirmation and no-image fallback are explicit');
 assert(entry.includes('reference-assets.json') && entry.includes('video-config.json'), 'entry hands off internal state');
 assert(entry.includes('两种模式都使用 `video-config.json`') && entry.includes('手动模式保持 `bindings=[]`') && entry.includes('只有自动平台适配模式才启用 `reference-assets.json`'), 'entry keeps config in both modes and ledger only for automatic bindings');
 assert(!/ref_anchors[^\n]*(?:→|映射为)[^\n]*(?:<Picture N>|<图片N>)/.test(script), '03 must not compile anchors into model tags');
@@ -45,7 +45,7 @@ const invokeManual = (file, storyboardFile = null) => {
 // A: confirmed model with no images is valid T2V and carries no bindings/tags.
 invoke('validate_video_config.cjs', {schema_version:1,target_model:'seedance',selection_source:'user_explicit',output_variant:'single',state:'locked',bindings:[]}, true);
 // B: semantic anchors remain names, never model tags.
-assert(script.includes('方括号不得填入') && !/ref_anchors[^\n]*(?:→|映射为)[^\n]*(?:<Picture N>|<图片N>)/.test(script), 'manual slots are not model tags');
+assert(script.includes('最终 03 映射块只能渲染标题和严格映射行') && !/ref_anchors[^\n]*(?:→|映射为)[^\n]*(?:<Picture N>|<图片N>)/.test(script), 'manual slots are not model tags');
 assert(out.includes('默认手动槽位模式') && plan.includes('语义名称 = [图片槽位]'), '04 supports one-time manual mapping');
 // C/D: verified character/scene and storyboard frame can be bound through neutral IDs.
 const verified = {schema_version:1,assets:[
@@ -128,7 +128,7 @@ const manual04 = path.join(__dirname, 'fixtures/actual-project/04-视频提示�
 const actualSb = path.join(__dirname, 'fixtures/actual-project/.movie-create/storyboard.json');
 assert.strictEqual(invokeManual(manual03, actualSb).status, 0, '03 manual slots fixture must pass');
 assert.strictEqual(invokeManual(manual04).status, 0, '04 manual slots fixture must pass');
-const wrappedSb = path.join(temp, 'wrapped-storyboard.json'); fs.writeFileSync(wrappedSb, JSON.stringify({storyboard:{shots:[{characters:['林'],scene:'室内'}]}}));
+const wrappedSb = path.join(temp, 'wrapped-storyboard.json'); fs.writeFileSync(wrappedSb, JSON.stringify({storyboard:{shots:[{characters:['林','周'],scene:'室内'}]}}));
 assert.strictEqual(invokeManual(manual03, wrappedSb).status, 0, 'wrapped storyboard fixture must pass');
 for (const [name, body, error] of [
   ['duplicate-name', '## 参考资产映射\n- 林 = [林设定图]\n- 林 = [林设定图]\n', '语义名称重复'],
@@ -144,6 +144,24 @@ const sceneSb = path.join(temp, 'scene-storyboard.json'); fs.writeFileSync(scene
 const missingResult = invokeManual(missing, sceneSb); assert.notStrictEqual(missingResult.status, 0, 'missing scene mapping must fail'); assert(`${missingResult.stdout}\n${missingResult.stderr}`.includes('缺少场景映射'), 'missing scene error');
 const wrappedMissing = path.join(temp, 'wrapped-missing-role.json'); fs.writeFileSync(wrappedMissing, JSON.stringify({storyboard:{shots:[{characters:['王'],scene:'室内'}]}}));
 const wrappedMissingResult = invokeManual(manual03, wrappedMissing); assert.notStrictEqual(wrappedMissingResult.status, 0, 'wrapped missing role must fail'); assert(`${wrappedMissingResult.stdout}\n${wrappedMissingResult.stderr}`.includes('缺少角色映射'), 'wrapped missing role error');
+// Deterministic card resolution: exact name, missing card, normalized duplicates and orphan/order are rejected.
+function makeCardProject(label, roleFiles, sceneFiles, mapping, shots) {
+  const dir = path.join(temp, label); fs.mkdirSync(path.join(dir, '01-角色提示词'), {recursive:true}); fs.mkdirSync(path.join(dir, '02-场景提示词'), {recursive:true});
+  for (const f of roleFiles) fs.writeFileSync(path.join(dir, '01-角色提示词', f), '# 角色');
+  for (const f of sceneFiles) fs.writeFileSync(path.join(dir, '02-场景提示词', f), '# 场景');
+  const out = path.join(dir, '03.md'); fs.writeFileSync(out, `## 参考资产映射\n${mapping.map(([n,s]) => `- ${n} = [${s}]`).join('\n')}\n## 提示词\n正文`);
+  const sb = path.join(dir, 'storyboard.json'); fs.writeFileSync(sb, JSON.stringify({shots})); return [out, sb];
+}
+let [cardFile, cardSb] = makeCardProject('exact-card', ['林.md'], ['室内.md'], [['林','林图'],['室内','室内图']], [{characters:['林'],scene:'室内'}]);
+assert.strictEqual(invokeManual(cardFile, cardSb).status, 0, 'exact card names pass');
+[cardFile, cardSb] = makeCardProject('missing-card', [], ['室内.md'], [['林','林图'],['室内','室内图']], [{characters:['林'],scene:'室内'}]);
+assert.notStrictEqual(invokeManual(cardFile, cardSb).status, 0, 'missing role card fails');
+[cardFile, cardSb] = makeCardProject('normalized-multiple', ['林.md','林　.md'], ['室内.md'], [['林','林图'],['室内','室内图']], [{characters:['林'],scene:'室内'}]);
+assert.notStrictEqual(invokeManual(cardFile, cardSb).status, 0, 'normalized multiple cards fail');
+[cardFile, cardSb] = makeCardProject('non-exact', ['林 .md'], ['室内.md'], [['林','林图'],['室内','室内图']], [{characters:['林'],scene:'室内'}]);
+const nonExactResult = invokeManual(cardFile, cardSb); assert.notStrictEqual(nonExactResult.status, 0, 'non-exact card filename fails'); assert(`${nonExactResult.stdout}\n${nonExactResult.stderr}`.includes('精确一致'), 'non-exact filename error');
+ [cardFile, cardSb] = makeCardProject('orphan-order', ['林.md','周.md'], ['室内.md'], [['周','周图'],['林','林图'],['室内','室内图']], [{characters:['林','周'],scene:'室内'}]);
+assert.notStrictEqual(invokeManual(cardFile, cardSb).status, 0, 'orphan/order mapping fails');
 const outside = path.join(temp, 'outside-mapping.md'); fs.writeFileSync(outside, '## 参考资产映射\n- 林 = [林设定图]\n## 正文\n- 周 = [周设定图]\n');
 assert.strictEqual(invokeManual(outside).status, 0, 'mapping outside block is ignored');
 const malformed = path.join(temp, 'malformed-bullet.md'); fs.writeFileSync(malformed, '## 参考资产映射\n- 林：[林设定图]\n');

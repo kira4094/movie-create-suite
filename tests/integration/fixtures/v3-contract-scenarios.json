@@ -6,7 +6,7 @@
   {"name":"恐怖高饱和","type":"negative-absent","file":"skills/movie-create-drama-script/references/script-spec.md","expect":"写实真人、3D塑料感"},
   {"name":"默认4:3","type":"fixture","file":"tests/cards/fixtures/scene/pass.md","expect":"默认 4:3"},
   {"name":"显式9:16","type":"fixture","file":"tests/cards/fixtures/scene/pass-916.md","expect":"9:16"},
-  {"name":"Part4豁免","type":"fixture","file":"tests/cards/fixtures/character/exempt-part4.md","expect":"用户明确豁免"},
+  {"name":"Part4豁免","type":"negative-absent","file":"tests/cards/fixtures/character/exempt-part4.md","expect":"## Part 4"},
   {"name":"emotion三处注入且空镜无注入","type":"doc-all","file":"skills/movie-create-drama-emotion/SKILL.md","expect":["character_peak_expressions[]","shot_emotion_directives[]","空镜"]},
   {"name":"dialogue逐镜冻结","type":"doc-all","file":"skills/movie-create-drama-dialogue/SKILL.md","expect":["shot_id","逐字一致","dialogue` 为空"]},
   {"name":"script生成分镜脚本图宫格","type":"doc-all","file":"skills/movie-create-drama-script/SKILL.md","expect":["唯一分镜块","超过9镜分页","03-分镜脚本图提示词.md"]},

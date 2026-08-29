@@ -32,7 +32,7 @@ const productionSection = styleSkill.slice(productionStart);
 for (const forbidden of ['Final_Video_Spec', 'storyboard_designer', '资产绑定']) assert(productionSection.includes(forbidden), `production-only operation missing from production section: ${forbidden}`);
 assert(!guideSection.includes('生成四张无参考风格试验样图') && !guideSection.includes('建立或更新 Final_Video_Spec.md') && !guideSection.includes('故事板设计器'), 'guide exit does not expose production operations');
 assert(entry.includes('movie-create-design-style(mode=entry_style_guide)') && entry.includes('唯一产出：.movie-create/style-guide.md'), 'entry A calls exact guide mode and declares sole product');
-assert(entry.includes('主链暂停由 entry 统一拥有') && entry.includes('直接模式最终响应只允许四块提示词'), 'entry owns pauses and visible delivery boundary');
+assert(entry.includes('主链暂停由 entry 统一拥有') && entry.includes('直接模式写入磁盘的 01-角色提示词'), 'entry owns pauses and visible delivery boundary');
 const directTemplateStart = entry.indexOf('## {小说名} · 影视化拆解完成');
 const directTemplateEnd = entry.indexOf('```', directTemplateStart + 3);
 assert(directTemplateStart >= 0 && directTemplateEnd > directTemplateStart, 'direct output template is present');
@@ -141,14 +141,16 @@ assert(!(forbiddenVoiceField in actualStoryboard.shots[0]) && !(forbiddenVoiceFi
 assert(!fs.existsSync(path.join(actualRoot, '03-分镜.json')), 'actual fixture has no legacy storyboard output');
 const actualFiles = [path.join(actualRoot, '01-角色提示词/林.md'), path.join(actualRoot, '02-场景提示词/室内.md'), path.join(actualRoot, '03-分镜脚本图提示词.md'), path.join(actualRoot, '04-视频提示词.txt')];
 const actualTexts = actualFiles.map(file => fs.readFileSync(file, 'utf8'));
-for (const text of actualTexts.slice(2)) {
-  assert(!/prompt_only|verified|bound|reference-assets\.json|video-config\.json|<Picture\s*\d+>|<图片\s*\d+>/.test(text), 'default 03/04 fixtures stay manual-slot and model-neutral');
-}
+const deliverableControlTerms = /待用户|手动附加|用户上传|未附图|待办|执行档位|快速资格|模式豁免|已省略：Part|默认可(?:改|替换)|可替换|生成说明|RUN_META|AUTO-LOCK|NEEDS-CONFIRMATION|LOCKED|\.movie-create|reference-assets|video-config|style_id：|继承 .*\.movie-create|执行模式：|纯文本提示词，不生成图片|【硬性|正文：模式|场景卡只生成|来自同一证据|同一证据来源|非剧情峰值|用户选择的/;
+const internalStateToken = /(?<![A-Za-z0-9_])(?:prompt_only|verified|bound)(?![A-Za-z0-9_])/;
+for (const text of actualTexts) assert(!deliverableControlTerms.test(text) && !internalStateToken.test(text), '01-04 fixture不得泄漏控制面字段');
+const manualPlatformTags = /<Picture\s*\d+>|<图片\s*\d+>|<Video\s*\d+>|<视频\s*\d+>|<Audio\s*\d+>|<音频\s*\d+>/;
+for (const text of actualTexts.slice(2)) assert(!manualPlatformTags.test(text), '默认手动 03/04 不得泄漏平台标签');
 for (const text of actualTexts.slice(2, 4)) assert((text.match(/## 参考资产映射/g) || []).length === 1, '03/04 have one mapping heading');
 assert(actualTexts[2].includes('林 = [林设定图]') && actualTexts[2].includes('室内 = [室内场景图]'), '03 mapping covers character and scene');
 assert(actualTexts[3].includes('林 = [林设定图]') && actualTexts[3].includes('客厅 = [客厅场景图]'), '04 mapping uses manual slots');
 const visibleReaction = '目光锁定门把手、指节收紧、呼吸短促';
-assert(actualTexts[0].includes('六格') && actualTexts[0].includes('起势、峰值、余波'), 'character fixture has six evidence frames');
+assert(actualTexts[0].includes('六格') && actualTexts[0].includes('目光锁定门把手'), 'character fixture has six visible expression frames');
 assert(actualStoryboard.shots[0].mood === '恐惧·中度' && actualStoryboard.shots[0].action.includes('抓住门把手'), 'storyboard carries frozen mood/action');
 assert(actualTexts[2].includes(visibleReaction), '03 carries visible reaction from character evidence');
 assert(actualTexts[3].includes(visibleReaction), '04 compiles the same visible reaction');
