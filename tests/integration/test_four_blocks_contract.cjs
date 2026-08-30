@@ -69,9 +69,9 @@ assert(read('skills/movie-create-drama-script/references/script-spec.md').includ
 assert(!read('skills/movie-create-design-character/SKILL.md').includes('快速条件：已满足'), 'character Skill does not advertise legacy quick marker');
 const character = read('skills/movie-create-design-character/SKILL.md');
 const characterSpec = read('skills/movie-create-design-character/references/character-card-spec.md');
-assert(character.includes('Part 矩阵唯一权威') && characterSpec.includes('按模式矩阵输出 Part'), 'character Part matrix is documented');
-assert(character.includes('可选扩展三视图') && character.includes('标准 Part2 多视图'), 'Part2 and optional three-view extension are distinct');
-assert(/Part\s*3 六格/.test(character) && !/Part\s*3 十格/.test(character) && !characterSpec.includes('2行×5列') && !characterSpec.includes('十情绪表情卡'), 'Part3 fixed six-grid contract has no ten-grid legacy wording');
+assert(character.includes('角色主卡 = Part 1 全身定妆照 + Part 2 多视图') && characterSpec.includes('角色主卡') && characterSpec.includes('用户明确请求'), 'character main/optional asset contract is documented');
+assert(character.includes('主卡 Part2 多视图') && character.includes('表演参考图') && character.includes('穿戴物细节图'), 'main and optional character assets are distinct');
+assert(character.includes('六格') && !characterSpec.includes('2行×5列') && !characterSpec.includes('十情绪表情卡'), 'optional performance grid contract has no ten-grid legacy wording');
 assert(!character.includes('禁止不提问直接默认') && !character.includes('产出提示词前必须先问清需求'), 'character direct mode has no unconditional pre-question gate');
 assert(!read('skills/movie-create-drama-story/SKILL.md').includes('列一版配置让用户确认'), 'story direct mode has no unconditional configuration confirmation gate');
 const story = read('skills/movie-create-drama-story/SKILL.md');
@@ -150,7 +150,7 @@ for (const text of actualTexts.slice(2, 4)) assert((text.match(/## 参考资产�
 assert(actualTexts[2].includes('林 = [林设定图]') && actualTexts[2].includes('室内 = [室内场景图]'), '03 mapping covers character and scene');
 assert(actualTexts[3].includes('林 = [林设定图]') && actualTexts[3].includes('客厅 = [客厅场景图]'), '04 mapping uses manual slots');
 const visibleReaction = '目光锁定门把手、指节收紧、呼吸短促';
-assert(actualTexts[0].includes('六格') && actualTexts[0].includes('目光锁定门把手'), 'character fixture has six visible expression frames');
+for (const text of actualTexts.slice(0, 2)) assert(!/## Part\s*[34]/.test(text), 'main character cards do not contain optional asset sections');
 assert(actualStoryboard.shots[0].mood === '恐惧·中度' && actualStoryboard.shots[0].action.includes('抓住门把手'), 'storyboard carries frozen mood/action');
 assert(actualTexts[2].includes(visibleReaction), '03 carries visible reaction from character evidence');
 assert(actualTexts[3].includes(visibleReaction), '04 compiles the same visible reaction');

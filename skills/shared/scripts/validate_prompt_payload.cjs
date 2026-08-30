@@ -8,7 +8,7 @@ const count = text => Array.from(String(text ?? '')).length;
 function blocks(text, re) { const ms=[...text.matchAll(re)]; return ms.map((m,i)=>({id:m[1]||String(i+1), text:text.slice(m.index+m[0].length,i+1<ms.length?ms[i+1].index:text.length)})); }
 function validate(text, kind, opts={}) {
   const limits={...DEFAULT_LIMITS,...(opts.limits||{})}; const issues=[]; const units=[];
-  if (kind==='character') { units.push(...blocks(text,/^##\s+Part\s+([1-4])[^\n]*(?:\r?\n|$)/gmi).map(x=>({...x,limit:limits.characterPart}))); if(!units.length) issues.push('no valid character Part units'); }
+  if (kind==='character') { units.push(...blocks(text,/^##\s+Part\s+([1-4])[^\n]*(?:\r?\n|$)/gmi).map(x=>({...x,limit:limits.characterPart}))); if(!units.length && opts.allowUnstructured) units.push({id:'optional-asset',text,limit:limits.characterPart}); else if(!units.length) issues.push('no valid character Part units'); }
   else if (kind==='scene') {
     const mappingMatch=text.match(/^参考图映射\s*：|^##\s*参考图映射\s*$/im); const mapping=mappingMatch?mappingMatch.index:-1; if(mapping<0) issues.push('scene missing 参考图映射');
     const endRe=/^##\s+(?:场景)?(?:变化线|关键道具)/im; const endMatch=mapping>=0?text.slice(mapping).search(endRe):-1; const end=mapping>=0?(endMatch<0?text.length:mapping+endMatch):0;
