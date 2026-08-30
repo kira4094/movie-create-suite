@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // validate_character_card.cjs — 角色卡 v3 精确契约校验
 const fs = require('fs');
+const payload = require('./validate_prompt_payload.cjs');
 const file = process.argv[2];
 const expectedArg = process.argv[3] || '1,2,3,4';
 const expected = expectedArg.split(/[,，→\s]+/).filter(Boolean).map(Number);
@@ -22,7 +23,7 @@ const schemas = {
 };
 function strictPart(n, body) {
   const fields = schemas[n]; if (!fields) { issues.push(`FAIL Part${n}：不允许的 Part`); return; }
-  const hs = body.split(/\r?\n/).map(x => x.trim()).filter(Boolean).filter(x => /^[^：\n]+：/.test(x)).map(x => x.slice(0,x.indexOf('：')));
+  const hs = body.split(/\r?\n/).map(x => x.trim()).filter(Boolean).filter(x => /^[^：\n]+：/.test(x)).map(x => x.slice(0,x.indexOf('：')).replace(/（强制）$/,''));
   for (const f of fields) if (hs.filter(x => x === f).length !== 1) issues.push(`FAIL Part${n}：字段「${f}」必须恰好出现一次`);
   for (const h of hs) if (!fields.includes(h)) issues.push(`FAIL Part${n}：禁止额外字段「${h}」`);
   const ix = fields.map(f => hs.indexOf(f)); if (ix.some(i => i < 0) || ix.some((v,i) => i && v <= ix[i-1])) issues.push(`FAIL Part${n}：字段顺序错误或字段合并`);
@@ -31,7 +32,7 @@ function strictPart(n, body) {
   if (wanted && spec !== wanted) issues.push(`FAIL Part${n}：固定画幅/分辨率错误`);
   if (n === 4 && !/^4:3横版 2K\s+\d+行×\d+列\d+格$/.test(spec)) issues.push('FAIL Part4：固定画幅/分辨率错误');
   if (n > 1 && !/Part\s*1|Picture 1|角色1/.test(body)) issues.push(`FAIL Part${n}：必须引用 Part1 唯一事实源`);
-  if (n === 2 && (!/左侧45°|左侧45度/.test(body) || !/右侧90°|右侧90度|右侧面/.test(body) || !/下区裁切/.test(body))) issues.push('FAIL Part2：视角/下区裁切受控派生要求缺失');
+  if (n === 2 && (!/左侧45°|左侧45度/.test(body) || !/右侧90°|右侧90度|右侧面/.test(body) || !/下区(?:裁切|锁骨至鞋履)/.test(body))) issues.push('FAIL Part2：视角/下区布局受控派生要求缺失');
   if (n === 3 && !/2行×3列六格|2行x3列六格|六格/.test(body)) issues.push('FAIL Part3：缺少六格峰值表情布局');
   if (n === 3 && /(?:｜|\|)证据[“\"]|有证据的表情/.test(body)) issues.push('FAIL Part3：不得暴露证据来源或内部选择机制');
   if (n === 4) {
@@ -67,6 +68,8 @@ const strict = /^(?:参考图映射|图片对齐)：/m.test(s) || /生成规格�
 if (strict) expected.forEach(n => strictPart(n, parts.get(n) || ''));
 else expected.forEach(n => { const b=parts.get(n)||''; if (!b) issues.push(`FAIL Part${n}：缺失`); else { if (!/技能0/.test(b)) issues.push(`FAIL Part${n}：缺少本 Part 的技能0`); if (!/一致性铁律/.test(b)) issues.push(`FAIL Part${n}：缺少本 Part 的一致性铁律`); } });
 if (/##\s+Part\s+3/.test(s) && !/(6\s*格|六格|2行\s*[×x*]\s*3列)/i.test(s)) issues.push('FAIL Part3：缺少六格峰值表情布局');
+const payloadResult = payload.validate(s, 'character');
+for (const issue of payloadResult.issues) issues.push(`FAIL 提示词预算/安全：${issue}`);
 const positive = s.split(/\r?\n/).filter(x => /背景/.test(x) && !/负面|禁止|反向|不要|不得/.test(x)).join('\n');
 for (const w of ['森林','山水','城市','庭院','宫殿','场景背景']) if (positive.includes(w)) issues.push(`FAIL 背景正向段含场景词「${w}」`);
 if (!/纯色/.test(positive)) issues.push('FAIL 背景正向段缺少纯色约束');

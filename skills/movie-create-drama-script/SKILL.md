@@ -139,6 +139,8 @@ assets: {
 
 ## 质量检查清单（交付前逐项）
 
+- 渲染 03 后必须执行（从 `skills/movie-create-drama-script` 目录运行）：`node ../shared/scripts/validate_prompt_payload.cjs <03文件> storyboard`；失败不得交付。每页共享规格与当页全部单格合计 ≤2700，仍超限必须拆页，不得删除关键镜头事实。
+
 - [ ] 分镜 JSON 符合 Schema（purpose/continuity/coverage/assets/hook/ref_anchors 齐全）
 - [ ] coverage 无丢戏（每个节拍 covered 或注明原因），shot_ids 字段名正确
 - [ ] 每镜 props 名与 assets 中 props.id 完全一致（不简写/不换名）

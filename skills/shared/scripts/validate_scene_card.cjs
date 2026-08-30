@@ -3,6 +3,7 @@
 // 校验：硬性4段 / 风格内联(不写编号) / 二选一(精简6段或完整) / 本体状态分离 / 景别机位
 // 用法：node validate_scene_card.cjs <场景卡.md> [1|2]
 const fs = require('fs');
+const payload = require('./validate_prompt_payload.cjs');
 const file = process.argv[2];
 const expectedMode = process.argv[3] || '2';
 if (!file) { console.error('用法: node validate_scene_card.cjs <场景卡.md>'); process.exit(2); }
@@ -70,6 +71,8 @@ if (variationSection) {
 for (const line of s.split(/\r?\n/)) {
   if (/生成规格/.test(line) && !/^\s*(?:#{1,6}\s*)?生成规格(?:\s*[：:]|\s*$)/i.test(line)) issues.push('FAIL 字段位置：生成规格关键词位于错误区块');
 }
+const payloadResult = payload.validate(s, 'scene');
+for (const issue of payloadResult.issues) issues.push(`FAIL 提示词预算/安全：${issue}`);
 
 if (issues.length === 0) console.log(`PASS: ${file}（硬性4段/风格内联/精简六段 全合格）`);
 else { console.log(`FAIL: ${file}\n` + issues.join('\n')); process.exit(1); }
