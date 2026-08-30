@@ -28,11 +28,33 @@ function strictPart(n, body) {
   for (const h of hs) if (!fields.includes(h)) issues.push(`FAIL Part${n}：禁止额外字段「${h}」`);
   const ix = fields.map(f => hs.indexOf(f)); if (ix.some(i => i < 0) || ix.some((v,i) => i && v <= ix[i-1])) issues.push(`FAIL Part${n}：字段顺序错误或字段合并`);
   const spec = body.match(/^生成规格：(.+)$/m)?.[1] || '';
-  const wanted = {1:'9:16竖版 2K',2:'4:3横版 2K',3:'16:9横版 2K 2行×3列六格'}[n];
+  const wanted = {1:'9:16竖版 2K',2:'3:4竖版 2K 2行×3列六格',3:'16:9横版 2K 2行×3列六格'}[n];
   if (wanted && spec !== wanted) issues.push(`FAIL Part${n}：固定画幅/分辨率错误`);
   if (n === 4 && !/^4:3横版 2K\s+\d+行×\d+列\d+格$/.test(spec)) issues.push('FAIL Part4：固定画幅/分辨率错误');
   if (n > 1 && !/Part\s*1|Picture 1|角色1/.test(body)) issues.push(`FAIL Part${n}：必须引用 Part1 唯一事实源`);
-  if (n === 2 && (!/左侧45°|左侧45度/.test(body) || !/右侧90°|右侧90度|右侧面/.test(body) || !/下区(?:裁切|锁骨至鞋履)/.test(body))) issues.push('FAIL Part2：视角/下区布局受控派生要求缺失');
+  if (n === 2) {
+    const layout = body.match(/^视角布局：(.+)$/m)?.[1] || '';
+    const limit = body.match(/^限制：(.+)$/m)?.[1] || '';
+    const required = [
+      ['六格网格', /2行[×x]3列六格/],
+      ['上排三角度', /上排[^；。]*头颈正面[^；。]*头颈左侧45°[^；。]*头颈右侧90°/],
+      ['下排三角度', /下排[^；。]*锁骨至鞋履正面[^；。]*锁骨至鞋履左侧45°[^；。]*锁骨至鞋履右侧90°/],
+      ['高度比例', /上排约35%[^；。]*下排约65%/],
+      ['列对齐', /三列等宽[^；。]*上下列严格对齐/],
+      ['下排上缘与连续范围', /锁骨和双肩作为画面上缘[^；。]*躯干[^；。]*双臂[^；。]*腰胯[^；。]*腿部至鞋履/],
+      ['下排头颈排除', /头部、面部、头发、耳朵、颈部不进入下排/],
+    ];
+    for (const [label, pattern] of required) if (!pattern.test(layout)) issues.push(`FAIL Part2：缺少${label}强约束`);
+    if (/裁切|横截面|切口|截断|背面|全身三视图|完整全身/.test(layout)) issues.push('FAIL Part2：视角布局不得出现裁切/解剖切面/背面/全身三视图');
+    // 只审查视角布局与受控派生的正向语义；参考图映射可合法包含“Part1全身定妆照”，限制字段可合法写禁止句。
+    const derived = body.match(/^受控派生：(.+)$/m)?.[1] || '';
+    for (const field of [layout, derived]) {
+      const positive = field.replace(/禁止[^；。]*|不得[^；。]*|不进入[^；。]*/g, '');
+      if (/背面视角|全身图|全身视图|全身像|全身三视图|完整人物/.test(positive)) issues.push('FAIL Part2：禁止正向要求背面视角或全身三视图');
+    }
+    if (!/禁止背面视角/.test(limit) || !/完整人物全身图和全身三视图|不得成为完整人物全身图|不得成为全身三视图/.test(limit)) issues.push('FAIL Part2：限制必须禁止背面及下排全身图');
+    if (!/重生成下排三格/.test(limit) || !/上下排分两张生成后拼版/.test(limit) || !/局部重绘下排/.test(limit)) issues.push('FAIL Part2：必须完整列出三条允许的失败降级路径');
+  }
   if (n === 3 && !/2行×3列六格|2行x3列六格|六格/.test(body)) issues.push('FAIL Part3：缺少六格峰值表情布局');
   if (n === 3 && /(?:｜|\|)证据[“\"]|有证据的表情/.test(body)) issues.push('FAIL Part3：不得暴露证据来源或内部选择机制');
   if (n === 4) {
