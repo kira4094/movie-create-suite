@@ -178,6 +178,8 @@ OUT 不把第一次判断人物、资产、空间和镜头关系的过程隐藏�
 - 分镜 JSON 已含每镜的 `camera/action/mood/dialogue/ref_anchors` + 扁平 `meta.style_source/style_id/style_name`——可跳过重复剧情解析；手动槽位模式只继承文首映射，自动平台适配模式才不得跳过账本与本次 binding 的参考资产解析。纯环境镜（`characters=[]` 或 `mood` 为空）不展开人物情绪、生理反应、呼吸或情绪声音，只保留环境声与真实环境反馈。
 - **风格字段读取顺序**：先读取 `storyboard.meta.style_source` 的完整风格定调，再用 `style_id` 精确补充单个 96 风格定义，`style_name` 仅用于展示。预设风格三者均有值；自定义风格 `style_id` 为 `null`；用户明确跳过时三者均为 `null`。选中风格但 `style_source` 或所需权威文件缺失时必须报告并停止，不得静默使用默认风格。
 - 编译时逐镜处理 `camera` + `action` + `mood`（仅人物镜展开）+ `dialogue` + `voice_directives` + `ref_anchors`；voice directive 必须与最终 shot_id/speaker/dialogue 逐项一致，否则停止退回，不自行改台词。
+
+- OUT 只接受已通过 storyboard 校验的中文化 `storyboard.shot_size` 与 `camera`；旧输入的英文缩写只能在迁移/编译预处理阶段识别并转换，不能写回或作为有效 storyboard 接受。最终 04 正文禁止出现 ELS、LS、FS、MLS、MS、MCU、CU、ECU 等英文景别缩写。
 - **⚠️ 情绪展开规则（仅人物表演镜）**：
   - `characters=[]` 或 `mood` 为空的纯环境镜不展开人物生理表现、呼吸或情绪声音，只写环境声和真实环境反馈；人物镜的 `mood` 才展开为可表演的生理表现。
   - **情绪链完整**：相邻镜头情绪需有过渡缓冲（峰值前铺垫、峰值后回落）；情绪峰值伴随肢体失控/抑制反应（屏息/轻颤/僵直）；情绪回落通过呼吸放缓、肌肉松弛体现

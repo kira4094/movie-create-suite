@@ -1,1 +1,40 @@
-{"duration_seconds":3,"shots":[{"shot_id":"镜头-1","time_range":"0:00-0:01","duration":"一秒","scene":"白墙前","purpose":"停留","continuity":{"start":{"position":"墙前","posture":"站立","props":[]},"end":{"position":"墙前","posture":"站立","props":[]}},"hook":"影子移动","ref_anchors":[],"characters":[],"props":[]}],"assets":{"characters":[],"scenes":[{"id":"白墙前"}],"props":[]},"coverage":[]}
+{
+  "duration_seconds": 3,
+  "shots": [
+    {
+      "shot_id": "镜头-1",
+      "time_range": "0:00-0:01",
+      "duration": "一秒",
+      "scene": "白墙前",
+      "purpose": "停留",
+      "continuity": {
+        "start": {
+          "position": "墙前",
+          "posture": "站立",
+          "props": []
+        },
+        "end": {
+          "position": "墙前",
+          "posture": "站立",
+          "props": []
+        }
+      },
+      "hook": "影子移动",
+      "ref_anchors": [],
+      "characters": [],
+      "props": [],
+      "shot_size": "中景",
+      "camera": "固定机位，正面平视"
+    }
+  ],
+  "assets": {
+    "characters": [],
+    "scenes": [
+      {
+        "id": "白墙前"
+      }
+    ],
+    "props": []
+  },
+  "coverage": []
+}

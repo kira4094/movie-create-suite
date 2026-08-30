@@ -12,6 +12,19 @@ const sr=v.validate(scene,'scene'); assert(!sr.ok && sr.units.some(x=>x.id==='va
 assert(v.validate('## 第一页\n汉','storyboard').ok); assert(v.validate('无页标题但有正文','storyboard').ok);
 assert(v.validate('合并视频正文','video').ok); assert(v.validate('## S01-01\n汉\n## S01-02\n汉','video').ok);
 assert(!v.validate('## S01-01\n冻结对白裸露','video').ok); console.log('PASS: prompt payload safety/unit coverage');
+for (const kind of ['character','scene','storyboard','video']) {
+  const payload = kind==='character' ? '## Part 1\n' : kind==='scene' ? '参考图映射：无\n' : kind==='storyboard' ? '## 第一页\n' : '## S01-01\n';
+  for (const abbreviation of ['ELS','LS','FS','MLS','MS','MCU','CU','ECU']) assert(!v.validate(payload+'构图 '+abbreviation,kind).ok);
+  assert(!v.validate(payload+'构图 FS全身景',kind).ok);
+  assert(!v.validate(payload+'构图 全身景FS',kind).ok);
+  assert(!v.validate(payload+'构图 MS/FS',kind).ok);
+  assert(!v.validate(payload+'构图 (LS)',kind).ok);
+  assert(!v.validate(payload+'构图 fs',kind).ok);
+  assert(v.validate(payload+'构图大全景，人物完整入画',kind).ok);
+}
+assert(v.validate('## Part 1\nMS Paint 式构图', 'character').ok);
+assert(!v.validate('## Part 1\nMS Painter 式构图', 'character').ok);
+console.log('PASS: Chinese shot-size output contract');
 const shared='共享规格'+ '汉'.repeat(2600);
 assert(!v.validate(shared+'\n# 文档标题\n## 第一页\n'+ '汉'.repeat(100),'storyboard').ok);
 assert(!v.validate(shared+'\n# 文档标题\n## S01-01\n'+ '汉'.repeat(100),'video').ok);

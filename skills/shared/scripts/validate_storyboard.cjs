@@ -32,6 +32,20 @@ function parseRange(value) {
   return { start: Number(m[1]) * 60 + Number(m[2]), end: Number(m[3]) * 60 + Number(m[4]) };
 }
 function container(data) { return data && data.storyboard && typeof data.storyboard === 'object' && !Array.isArray(data.storyboard) ? data.storyboard : data; }
+const SHOT_SIZE_ABBREVIATIONS = /(?<![A-Za-z0-9])(ELS|LS|FS|MLS|MS|MCU|CU|ECU)(?![A-Za-z0-9])/i;
+const CHINESE_SHOT_SIZES = /^(大特写|中远景|中近景|大远景|全身景|插入镜头|远景|中景|特写)(?=$|[\s，,、；;：:（）()【】\[\]。])/;
+const CAMERA_TOKENS = /(固定机位|平视|俯视|仰视|正面|侧面|背面|过肩|主观视角|低机位|高机位|推镜|拉镜|摇镜|移镜|跟镜|环绕|升降|手持|航拍)/g;
+const CAMERA_QUALIFIERS = /(主体|画面|人物|环境|空间关系|方向|速度|起点|终点|保持锁定)/;
+function validateShotCamera(shot, issues) {
+  ['shot_size', 'camera'].forEach((field) => {
+    if (!(field in shot)) return;
+    const value = shot[field];
+    if (typeof value !== 'string' || value.trim() === '') { add(issues, 'high', field, shot.shot_id, `${field} 存在时必须是非空文本`); return; }
+    if (SHOT_SIZE_ABBREVIATIONS.test(value)) add(issues, 'high', field, shot.shot_id, `${field} 不得含英文景别缩写`);
+    if (field === 'shot_size' && !CHINESE_SHOT_SIZES.test(value.trim())) add(issues, 'high', field, shot.shot_id, 'shot_size 必须以规范中文景别全称开头，后接合法分隔符或结束');
+    if (field === 'camera') { const tokens = [...new Set(value.match(CAMERA_TOKENS) || [])]; if (tokens.length < 2 && !(tokens.length >= 1 && CAMERA_QUALIFIERS.test(value))) add(issues, 'high', field, shot.shot_id, 'camera 必须包含至少两个不同的明确机位/角度要素，或一个要素加可执行空间/运动限定'); }
+  });
+}
 
 function validate(data, scriptText) {
   const root = container(data); const issues = [];
@@ -40,10 +54,11 @@ function validate(data, scriptText) {
   if (!integer(target) || target <= 0) add(issues, 'high', 'duration_seconds', -1, 'duration_seconds 必须是有限正整数');
   if (!Array.isArray(shots) || shots.length === 0) add(issues, 'high', 'shots', -1, 'shots 必须是非空数组');
   const list = Array.isArray(shots) ? shots : []; const ids = new Set();
-  const required = ['shot_id', 'time_range', 'duration', 'scene', 'purpose', 'continuity', 'hook', 'ref_anchors'];
+  const required = ['shot_id', 'time_range', 'duration', 'scene', 'purpose', 'continuity', 'hook', 'ref_anchors', 'shot_size', 'camera'];
   list.forEach((shot, index) => {
     if (!shot || typeof shot !== 'object' || Array.isArray(shot)) { add(issues, 'high', 'structure', index + 1, '镜头必须是对象'); return; }
-    required.forEach((field) => { if (shot[field] === undefined || shot[field] === null || shot[field] === '') add(issues, 'high', 'structure', shot.shot_id || index + 1, `镜头缺少必填字段: ${field}`); });
+    required.forEach((field) => { if (shot[field] === undefined || shot[field] === null || (typeof shot[field] === 'string' && shot[field].trim() === '')) add(issues, 'high', 'structure', shot.shot_id || index + 1, `镜头缺少必填字段: ${field}`); });
+    validateShotCamera(shot, issues);
     if (ids.has(shot.shot_id)) add(issues, 'high', 'shot_id', shot.shot_id, `shot_id 重复: ${shot.shot_id}`);
     ids.add(shot.shot_id);
     if (!integer(shot.duration) || shot.duration < 1) add(issues, 'high', 'duration', shot.shot_id, 'duration 必须是有限正整数且至少为 1 秒');

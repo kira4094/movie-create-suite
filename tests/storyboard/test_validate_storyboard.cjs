@@ -19,7 +19,7 @@ function run(file, args = [], env = {}) {
   if (match) { try { report = JSON.parse(match[0]); } catch (_) {} }
   return { ...result, report };
 }
-function copy(name, out = name) { const dest = path.join(temp, out); fs.copyFileSync(fixture(name), dest); return dest; }
+function copy(name, out = name) { const dest = path.join(temp, out); const value = JSON.parse(fs.readFileSync(fixture(name), 'utf8')); const owner = value && value.storyboard && typeof value.storyboard === 'object' ? value.storyboard : value; if (owner && Array.isArray(owner.shots)) owner.shots.forEach((shot) => { if (!('shot_size' in shot)) shot.shot_size = '中景'; if (!('camera' in shot)) shot.camera = '固定机位，正面平视'; }); fs.writeFileSync(dest, JSON.stringify(value)); return dest; }
 function has(report, text) { return report && report.issues.some((issue) => issue.problem.includes(text)); }
 function expectExit(result, code, message) { assert.strictEqual(result.status, code, `${message}: ${result.stderr}\n${result.stdout}`); }
 function sha(file) { return require('crypto').createHash('sha256').update(fs.readFileSync(file)).digest('hex'); }
@@ -33,6 +33,43 @@ function withoutAllowedDurations(value) {
 try {
   let result = run(copy('storyboard-valid-v1.json'));
   expectExit(result, 0, '有效 v1'); assert.strictEqual(result.report.verdict, 'PASS');
+  const shotContract = JSON.parse(fs.readFileSync(fixture('storyboard-valid-v1.json')));
+  shotContract.shots.forEach((shot) => { shot.shot_size = '中景'; shot.camera = '正面平视，人物位于画面中央'; });
+  const shotContractFile = path.join(temp, 'shot-contract.json'); fs.writeFileSync(shotContractFile, JSON.stringify(shotContract));
+  result = run(shotContractFile); expectExit(result, 0, '中文景别与物理构图通过');
+  for (const field of ['shot_size', 'camera']) {
+    const missing = JSON.parse(JSON.stringify(shotContract)); delete missing.shots[0][field];
+    const missingFile = path.join(temp, `shot-missing-${field}.json`); fs.writeFileSync(missingFile, JSON.stringify(missing));
+    result = run(missingFile); expectExit(result, 1, `缺少 ${field} 拒绝`); assert.ok(has(result.report, `镜头缺少必填字段: ${field}`));
+    const blank = JSON.parse(JSON.stringify(shotContract)); blank.shots[0][field] = '  ';
+    const blankFile = path.join(temp, `shot-blank-${field}.json`); fs.writeFileSync(blankFile, JSON.stringify(blank));
+    result = run(blankFile); expectExit(result, 1, `${field} 空白拒绝`);
+  }
+  for (const value of ['镜头很好', '人物很好', '视角独特', '景别正常', '构图', '环境', '机位', '正面']) {
+    const invalid = JSON.parse(JSON.stringify(shotContract)); invalid.shots[0].shot_size = value;
+    const invalidFile = path.join(temp, `shot-weak-${value}.json`); fs.writeFileSync(invalidFile, JSON.stringify(invalid));
+    result = run(invalidFile); expectExit(result, 1, `弱景别 ${value} 拒绝`);
+  }
+  for (const value of ['非中景', '中景外']) {
+    const invalid = JSON.parse(JSON.stringify(shotContract)); invalid.shots[0].shot_size = value;
+    const invalidFile = path.join(temp, `shot-boundary-${value}.json`); fs.writeFileSync(invalidFile, JSON.stringify(invalid));
+    result = run(invalidFile); expectExit(result, 1, `景别边界 ${value} 拒绝`);
+  }
+  for (const value of ['正面正面', '平视平视']) {
+    const invalid = JSON.parse(JSON.stringify(shotContract)); invalid.shots[0].camera = value;
+    const invalidFile = path.join(temp, `camera-duplicate-${value}.json`); fs.writeFileSync(invalidFile, JSON.stringify(invalid));
+    result = run(invalidFile); expectExit(result, 1, `重复机位 ${value} 拒绝`);
+  }
+  for (const value of ['镜头很好', '人物很好', '视角独特', '景别正常', '构图', '环境', '机位', '正面']) {
+    const invalid = JSON.parse(JSON.stringify(shotContract)); invalid.shots[0].camera = value;
+    const invalidFile = path.join(temp, `camera-weak-${value}.json`); fs.writeFileSync(invalidFile, JSON.stringify(invalid));
+    result = run(invalidFile); expectExit(result, 1, `弱机位 ${value} 拒绝`);
+  }
+  for (const value of ['FS', 'MS/FS', 'fs', '（LS）']) {
+    const invalid = JSON.parse(JSON.stringify(shotContract)); invalid.shots[0].shot_size = value;
+    const invalidFile = path.join(temp, `shot-invalid-${value.replace(/[^A-Za-z]/g, '') || 'symbol'}.json`); fs.writeFileSync(invalidFile, JSON.stringify(invalid));
+    result = run(invalidFile); expectExit(result, 1, `景别缩写 ${value} 拒绝`); assert.ok(has(result.report, '不得含英文景别缩写'));
+  }
   result = run(copy('storyboard-duration-mismatch-v1.json'), ['--dry-run']);
   expectExit(result, 1, 'dry-run 仍报告原始不匹配'); assert.strictEqual(result.report.fix_plan.durations[0], 6); assert.strictEqual(result.report.fix_applied, false);
   const mismatch = copy('storyboard-duration-mismatch-v1.json', 'mismatch-fix.json'); const before = fs.readFileSync(mismatch); const fixed = run(mismatch, ['--fix', '--backup']); expectExit(fixed, 0, '安全 fix'); assert.strictEqual(fixed.report.fix_applied, true); assert.deepStrictEqual(fs.readFileSync(`${mismatch}.bak`), before); assert.strictEqual(JSON.parse(fs.readFileSync(mismatch)).shots[0].duration, 6);

@@ -1,1 +1,65 @@
-{"duration_seconds":1,"shots":[{"shot_id":"镜头-1","time_range":"0:00-0:01","duration":1,"scene":"狭窄走廊","purpose":"前进","continuity":{"start":{"position":"走廊","posture":"行走","props":[]},"end":{"position":"走廊","posture":"行走","props":[]}},"hook":"脚步声逼近","ref_anchors":[],"characters":[],"props":[]},{"shot_id":"镜头-2","time_range":"0:01-0:02","duration":1,"scene":"狭窄走廊","purpose":"回望","continuity":{"start":{"position":"走廊","posture":"行走","props":[]},"end":{"position":"走廊","posture":"回望","props":[]}},"hook":"灯光闪烁","ref_anchors":[],"characters":[],"props":[]}],"assets":{"characters":[],"scenes":[{"id":"狭窄走廊"}],"props":[]},"coverage":[]}
+{
+  "duration_seconds": 1,
+  "shots": [
+    {
+      "shot_id": "镜头-1",
+      "time_range": "0:00-0:01",
+      "duration": 1,
+      "scene": "狭窄走廊",
+      "purpose": "前进",
+      "continuity": {
+        "start": {
+          "position": "走廊",
+          "posture": "行走",
+          "props": []
+        },
+        "end": {
+          "position": "走廊",
+          "posture": "行走",
+          "props": []
+        }
+      },
+      "hook": "脚步声逼近",
+      "ref_anchors": [],
+      "characters": [],
+      "props": [],
+      "shot_size": "中景",
+      "camera": "固定机位，正面平视"
+    },
+    {
+      "shot_id": "镜头-2",
+      "time_range": "0:01-0:02",
+      "duration": 1,
+      "scene": "狭窄走廊",
+      "purpose": "回望",
+      "continuity": {
+        "start": {
+          "position": "走廊",
+          "posture": "行走",
+          "props": []
+        },
+        "end": {
+          "position": "走廊",
+          "posture": "回望",
+          "props": []
+        }
+      },
+      "hook": "灯光闪烁",
+      "ref_anchors": [],
+      "characters": [],
+      "props": [],
+      "shot_size": "中景",
+      "camera": "固定机位，正面平视"
+    }
+  ],
+  "assets": {
+    "characters": [],
+    "scenes": [
+      {
+        "id": "狭窄走廊"
+      }
+    ],
+    "props": []
+  },
+  "coverage": []
+}

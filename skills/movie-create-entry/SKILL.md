@@ -125,6 +125,8 @@ D:\Projects\TolariaData\MovieCreate\{小说名}/
 
 > 新项目只交付上述四块；`.movie-create/` 不增加用户交付物。03 与 04 默认采用文档开头一次性的 `语义名称 = [图片槽位]` 手动参考图映射，后文只写语义名称。两种模式都使用 `video-config.json` 记录目标模型；手动模式保持 `bindings=[]`，只有自动平台适配模式才启用 `reference-assets.json` 及非空 bindings。内部还包括 `source/`、`scan-index.md`、`style-guide.md`、`storyboard.json`、`screenplay.md`、`review.md`，复杂 OUT 按需增加 `video-plan.md`。审阅结果写入 `.movie-create/review.md`。情绪和对白直接嵌入角色、分镜与视频。旧项目路径仅只读回退，禁止自动移动或删除。
 
+> **景别输出统一规则**：`shot-size-library.md` 中的英文全称与缩写只用于内部查表或迁移预处理；`storyboard.shot_size` 与 `camera` 在写入或接受为有效 `storyboard.json` 前必须已归一化为完整中文景别及物理构图描述，字段名保持不变。角色、场景、分镜脚本图和视频四块最终提示词，以及有效 storyboard，均禁止输出或保存 ELS、LS、FS、MLS、MS、MCU、CU、ECU 等英文景别缩写。
+
 > 若用户指定子目录（如 Realtest/），项目建在 `{根}/{子目录}/{小说名}/`。
 
 ## 调度规则

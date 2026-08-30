@@ -1,1 +1,96 @@
-{"duration_seconds":4,"shots":[{"shot_id":"镜头-1","time_range":"0:00-0:02","duration":2,"scene":"雨夜街口","purpose":"建立环境","continuity":{"start":{"position":"街口","posture":"站立","props":[]},"end":{"position":"街口","posture":"站立","props":[]}},"hook":"雨水映出灯光","ref_anchors":[],"characters":["人物甲"],"props":["雨伞"]},{"shot_id":"镜头-2","time_range":"0:02-0:04","duration":2,"scene":"雨夜街口","purpose":"人物抬头","continuity":{"start":{"position":"街口","posture":"站立","props":[]},"end":{"position":"街口","posture":"抬头","props":[]}},"hook":"远处传来钟声","ref_anchors":[],"characters":["人物甲"],"props":["雨伞"]}],"assets":{"characters":[{"id":"人物甲"}],"scenes":[{"id":"雨夜街口"}],"props":[{"id":"雨伞"}]},"coverage":[{"beat":"抵达","status":"covered","shot_ids":["镜头-1"]},{"beat":"抬头","status":"covered","shot_ids":["镜头-2"]}]}
+{
+  "duration_seconds": 4,
+  "shots": [
+    {
+      "shot_id": "镜头-1",
+      "time_range": "0:00-0:02",
+      "duration": 2,
+      "scene": "雨夜街口",
+      "purpose": "建立环境",
+      "continuity": {
+        "start": {
+          "position": "街口",
+          "posture": "站立",
+          "props": []
+        },
+        "end": {
+          "position": "街口",
+          "posture": "站立",
+          "props": []
+        }
+      },
+      "hook": "雨水映出灯光",
+      "ref_anchors": [],
+      "characters": [
+        "人物甲"
+      ],
+      "props": [
+        "雨伞"
+      ],
+      "shot_size": "中景",
+      "camera": "固定机位，正面平视"
+    },
+    {
+      "shot_id": "镜头-2",
+      "time_range": "0:02-0:04",
+      "duration": 2,
+      "scene": "雨夜街口",
+      "purpose": "人物抬头",
+      "continuity": {
+        "start": {
+          "position": "街口",
+          "posture": "站立",
+          "props": []
+        },
+        "end": {
+          "position": "街口",
+          "posture": "抬头",
+          "props": []
+        }
+      },
+      "hook": "远处传来钟声",
+      "ref_anchors": [],
+      "characters": [
+        "人物甲"
+      ],
+      "props": [
+        "雨伞"
+      ],
+      "shot_size": "中景",
+      "camera": "固定机位，正面平视"
+    }
+  ],
+  "assets": {
+    "characters": [
+      {
+        "id": "人物甲"
+      }
+    ],
+    "scenes": [
+      {
+        "id": "雨夜街口"
+      }
+    ],
+    "props": [
+      {
+        "id": "雨伞"
+      }
+    ]
+  },
+  "coverage": [
+    {
+      "beat": "抵达",
+      "status": "covered",
+      "shot_ids": [
+        "镜头-1"
+      ]
+    },
+    {
+      "beat": "抬头",
+      "status": "covered",
+      "shot_ids": [
+        "镜头-2"
+      ]
+    }
+  ]
+}

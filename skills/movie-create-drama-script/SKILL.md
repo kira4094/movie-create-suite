@@ -50,6 +50,8 @@ D:\Projects\TolariaData\MovieCreate\{小说名}\03-分镜脚本图提示词.md  
 在 dialogue 冻结前建议与 emotion 镜头 pass 返回后，合并并写入最终 `dialogue`、`speaker`、`mood`、`action`、`purpose`，随后冻结并渲染 `03-分镜脚本图提示词.md`。机械校验只对 3B 冻结结果执行。
 
 **3B 冻结结果每镜必填**：shot_id / time_range / duration（2-5s）/ scene / characters / props / shot_size / camera（一镜一运镜，起点-速度-终点）/ action（肢体级）/ dialogue（入镜前最终可表演文本）+ speaker / sfx / mood / **hook**（镜头钩子类型：定调/信息揭示/情绪爆发/悬念/笑点/反转/压迫/转场）/ **ref_anchors**（仅稳定的语义资产 ID，绝不表示图片存在）/ **purpose**（镜头目的）/ **screen_direction**（轴线，多主体时）/ **continuity.start-end**（边界锁）。3A draft 可暂缺 dialogue、speaker、mood；机械校验只接受 3B 冻结结果。
+
+**景别归一化铁律**：旧输入可在迁移/编译预处理阶段识别英文景别缩写，但在写入或接受为有效 `storyboard.json` 前，必须将 ELS、LS、FS、MLS、MS、MCU、CU、ECU 转换为完整中文景别及物理构图描述；有效 storyboard 以及最终 03 正文不得保存或输出这些缩写。不改 JSON 字段名。
 **style 字段（扁平风格契约）**：正式分镜 JSON 的 `storyboard.meta` 必须使用 `style_source`、`style_id`、`style_name`。优先读取 `.movie-create/style-guide.md`；旧项目才回退 `00-风格定调.md`。无风格时三者均为 `null`，继续生成中性描述，不凭空编造 HEX。
 
 全片：**coverage** + **assets**（以下为机械校验消费的确切格式）：
